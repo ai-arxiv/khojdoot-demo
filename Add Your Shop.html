@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Khoj Doot – Add your shop</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;800&family=Mukta:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbf7f0;--ink:#1f2a44;--muted:#5d6477;--line:#d9d2c3;--indigo:#243b8f;--saffron:#f0a000;--ok:#1f7a4d;--err:#b3261e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.5 Mukta,system-ui,sans-serif}
+main{max-width:520px;margin:0 auto;padding:24px 20px 60px}
+h1{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:1.9rem;line-height:1.15;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 18px}
+.demo{background:var(--saffron);color:#1f2a44;border-radius:8px;padding:6px 12px;font-size:.85rem;font-weight:600;margin-bottom:14px}
+.steps{display:flex;gap:6px;margin-bottom:22px}
+.steps div{flex:1;text-align:center;font-size:.85rem;font-weight:600;color:var(--muted);padding-bottom:6px;border-bottom:4px solid var(--line);transition:.25s}
+.steps div.on{color:var(--indigo);border-color:var(--indigo)}
+.steps div.done{color:var(--ok);border-color:var(--ok)}
+.pane{display:none}.pane.show{display:block;animation:in .3s}
+@keyframes in{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+label.l{display:block;font-weight:600;margin:16px 0 6px}
+input[type=text],input[type=tel]{width:100%;padding:13px 14px;font:inherit;border:2px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);transition:border-color .2s}
+input.bad{border-color:var(--err)}
+input:focus-visible,button:focus-visible,.drop:focus-visible{outline:3px solid var(--saffron);outline-offset:2px}
+.slug{font-size:.9rem;color:var(--muted);margin-top:8px}
+.drop{display:block;border:2px dashed var(--indigo);border-radius:14px;padding:30px 16px;text-align:center;font-weight:600;color:var(--indigo);cursor:pointer;background:#fff;transition:.2s}
+.drop.over{background:#eaf0ff;transform:scale(1.02)}
+.drop small{display:block;font-weight:400;color:var(--muted)}
+.thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.th{position:relative;animation:pop .25s}
+@keyframes pop{from{transform:scale(.7);opacity:0}to{transform:none;opacity:1}}
+.th img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;border:1px solid var(--line);display:block}
+.th b{position:absolute;top:-6px;right:-6px;width:26px;height:26px;border-radius:50%;background:var(--err);color:#fff;border:0;font-size:16px;line-height:26px;text-align:center;cursor:pointer}
+.th i{position:absolute;left:6px;bottom:6px;background:var(--saffron);color:#1f2a44;font-style:normal;font-size:.7rem;font-weight:600;padding:1px 7px;border-radius:6px}
+.count{font-size:.9rem;color:var(--muted);margin-top:8px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 6px 20px rgba(31,42,68,.08)}
+.card .cover{height:190px;background:#e9e3d4 center/cover}
+.card .info{padding:14px 16px}
+.card h2{font-family:Fraunces,Georgia,serif;margin:0;font-size:1.3rem}
+.card p{margin:2px 0 0;color:var(--muted)}
+.strip{display:flex;gap:6px;padding:0 16px 14px}.strip img{width:48px;height:48px;object-fit:cover;border-radius:8px}
+.row{display:flex;gap:10px;margin-top:22px}
+button{font:inherit;font-weight:600;border-radius:12px;padding:14px 18px;cursor:pointer;border:2px solid var(--indigo)}
+.pri{flex:1;background:var(--indigo);color:#fff}.sec{background:#fff;color:var(--indigo)}
+button[disabled]{opacity:.6;cursor:wait}
+.msg{color:var(--err);font-weight:600;margin-top:12px;min-height:1.5em}
+.bar{height:12px;background:var(--line);border-radius:8px;overflow:hidden;margin-top:18px;display:none}
+.bar div{height:100%;width:0;background:linear-gradient(90deg,var(--indigo),var(--saffron));transition:width .2s}
+.bar.show{display:block}
+.ok{text-align:center}
+.tick{width:84px;height:84px;margin:6px auto 10px;border-radius:50%;background:var(--ok);color:#fff;font-size:46px;line-height:84px;animation:pop .45s}
+.link{display:block;background:#fff;border:2px solid var(--ok);border-radius:12px;padding:12px;margin:14px 0;word-break:break-all;color:var(--indigo);font-weight:600}
+.row.c{flex-wrap:wrap}.row.c button,.row.c a{flex:1;text-align:center;text-decoration:none;min-width:130px}
+a.wa{background:#1f9d55;color:#fff;border-radius:12px;padding:14px 18px;font-weight:600}
+.fb{margin-top:28px;font-size:.85rem;color:var(--muted)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Add your shop to Khoj Doot</h1>
+  <p class="sub">Three quick steps. Your shop page is ready in a minute.</p>
+  <div class="demo" id="demoTag" hidden>Demo mode: no server is called. A sample link is shown.</div>
+
+  <div class="steps" id="steps"><div>1. About you</div><div>2. Photos</div><div>3. Send</div></div>
+
+  <!-- Step 1 -->
+  <section class="pane" data-s="0">
+    <label class="l" for="name">Shop or your name</label>
+    <input id="name" type="text" autocomplete="name" placeholder="Suman Blue Pottery">
+    <label class="l" for="phone">Phone number</label>
+    <input id="phone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile number">
+    <label class="l" for="city">City</label>
+    <input id="city" type="text" placeholder="Jaipur">
+    <div class="slug">Your shop link name: <b id="slugOut">–</b></div>
+    <div class="msg" id="m0"></div>
+    <div class="row"><button class="pri" data-next>Next: add photos</button></div>
+  </section>
+
+  <!-- Step 2 -->
+  <section class="pane" data-s="1">
+    <label class="drop" id="drop" tabindex="0">
+      Tap to add photos, or drop them here
+      <small>Up to 8 photos. The first one is your cover.</small>
+      <input id="photos" type="file" accept="image/*" multiple hidden>
+    </label>
+    <div class="thumbs" id="thumbs"></div>
+    <div class="count" id="count"></div>
+    <div class="msg" id="m1"></div>
+    <div class="row"><button class="sec" data-back>Back</button><button class="pri" data-next>Next: check</button></div>
+  </section>
+
+  <!-- Step 3 -->
+  <section class="pane" data-s="2">
+    <div class="card">
+      <div class="cover" id="pvCover"></div>
+      <div class="info"><h2 id="pvName"></h2><p id="pvMeta"></p></div>
+      <div class="strip" id="pvStrip"></div>
+    </div>
+    <div class="bar" id="bar"><div id="barIn"></div></div>
+    <div class="msg" id="m2"></div>
+    <div class="row"><button class="sec" data-back id="backBtn">Back</button><button class="pri" id="go">Create my shop</button></div>
+  </section>
+
+  <!-- Done -->
+  <section class="pane ok" data-s="3">
+    <div class="tick">✓</div>
+    <h2 style="font-family:Fraunces,serif;margin:0">Your shop is ready</h2>
+    <a class="link" id="link" target="_blank" rel="noopener"></a>
+    <div class="row c">
+      <button class="sec" id="copy">Copy link</button>
+      <a class="wa" id="wa" target="_blank" rel="noopener">Share on WhatsApp</a>
+    </div>
+    <div class="row"><button class="sec" id="again" style="flex:1">Add another shop</button></div>
+  </section>
+
+  <p class="fb">Backup path: use this form if WhatsApp is not working.</p>
+</main>
+
+<script>
+// ---- ONE LINE TO CHANGE: your backend address ----
+const API_BASE = "http://localhost:8000";
+// Add ?demo=1 to the page address to try the screens without a server.
+// ---------------------------------------------------
+const DEMO = new URLSearchParams(location.search).has("demo");
+const MAX = 8;
+const $ = id => document.getElementById(id);
+const panes = [...document.querySelectorAll(".pane")];
+const stepEls = [...$("steps").children];
+let step = 0, files = [];   // files = [{blob, url}]
+
+if (DEMO) $("demoTag").hidden = false;
+
+function show(n){
+  step = n;
+  panes.forEach(p => p.classList.toggle("show", +p.dataset.s === n));
+  stepEls.forEach((s,i) => s.className = i < n ? "done" : i === n ? "on" : "");
+  $("steps").style.display = n === 3 ? "none" : "flex";
+  if (n === 2) renderPreview();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function makeSlug(a,b){
+  return (a+" "+b).toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
+}
+const slug = () => makeSlug($("name").value,$("city").value);
+["name","city"].forEach(id => $(id).addEventListener("input",()=>{ $("slugOut").textContent = slug()||"–"; }));
+$("phone").addEventListener("input",e=>{ e.target.value = e.target.value.replace(/\D/g,"").slice(0,10); });
+
+// ---- validation per step ----
+function validate(n){
+  if(n===0){
+    const bad = [];
+    if(!$("name").value.trim()) bad.push("name");
+    if($("phone").value.length!==10) bad.push("phone");
+    if(!$("city").value.trim()) bad.push("city");
+    ["name","phone","city"].forEach(id => $(id).classList.toggle("bad",bad.includes(id)));
+    if(bad.length){ $("m0").textContent = bad.includes("phone") && bad.length===1 ? "Enter a 10-digit phone number." : "Please fill in the highlighted boxes."; $(bad[0]).focus(); return false; }
+    $("m0").textContent=""; return true;
+  }
+  if(n===1){
+    if(!files.length){ $("m1").textContent="Add at least one photo."; return false; }
+    $("m1").textContent=""; return true;
+  }
+  return true;
+}
+document.querySelectorAll("[data-next]").forEach(b=>b.onclick=()=>{ if(validate(step)) show(step+1); });
+document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>show(step-1));
+document.addEventListener("keydown",e=>{ if(e.key==="Enter" && step===0 && e.target.tagName==="INPUT"){ e.preventDefault(); if(validate(0)) show(1); } });
+
+// ---- photos: pick, drag-drop, remove, shrink ----
+const drop = $("drop"), input = $("photos");
+drop.addEventListener("click",e=>{ if(e.target!==input) input.click(); });
+drop.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); input.click(); } });
+["dragenter","dragover"].forEach(t=>drop.addEventListener(t,e=>{ e.preventDefault(); drop.classList.add("over"); }));
+["dragleave","drop"].forEach(t=>drop.addEventListener(t,e=>{ e.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop",e=>addFiles(e.dataTransfer.files));
+input.addEventListener("change",()=>{ addFiles(input.files); input.value=""; });
+
+async function shrink(file){
+  try{
+    const bmp = await createImageBitmap(file);
+    const k = Math.min(1, 1600/Math.max(bmp.width,bmp.height));
+    if(k===1 && file.size<800000) return file;
+    const c = document.createElement("canvas");
+    c.width = Math.round(bmp.width*k); c.height = Math.round(bmp.height*k);
+    c.getContext("2d").drawImage(bmp,0,0,c.width,c.height);
+    const blob = await new Promise(r=>c.toBlob(r,"image/jpeg",.85));
+    return blob && blob.size < file.size ? new File([blob], file.name.replace(/\.\w+$/,"")+".jpg",{type:"image/jpeg"}) : file;
+  }catch(_){ return file; }
+}
+async function addFiles(list){
+  const imgs = [...list].filter(f=>f.type.startsWith("image/"));
+  for(const f of imgs){
+    if(files.length>=MAX){ $("m1").textContent="Maximum "+MAX+" photos."; break; }
+    const small = await shrink(f);
+    files.push({blob:small,url:URL.createObjectURL(small)});
+    renderThumbs();
+  }
+}
+function renderThumbs(){
+  $("thumbs").innerHTML="";
+  files.forEach((f,i)=>{
+    const d=document.createElement("div"); d.className="th";
+    d.innerHTML='<img alt="Photo '+(i+1)+'">'+(i===0?"<i>Cover</i>":"")+'<b role="button" aria-label="Remove photo">×</b>';
+    d.querySelector("img").src=f.url;
+    d.querySelector("b").onclick=()=>{ URL.revokeObjectURL(f.url); files.splice(i,1); renderThumbs(); };
+    $("thumbs").appendChild(d);
+  });
+  $("count").textContent = files.length ? files.length+" of "+MAX+" photos added" : "";
+  if(files.length) $("m1").textContent="";
+}
+
+// ---- live preview card ----
+function renderPreview(){
+  $("pvName").textContent = $("name").value.trim();
+  $("pvMeta").textContent = $("city").value.trim()+" · "+$("phone").value;
+  $("pvCover").style.backgroundImage = "url("+files[0].url+")";
+  $("pvStrip").innerHTML = files.slice(1,6).map(f=>'<img alt="" src="'+f.url+'">').join("");
+  $("m2").textContent="";
+}
+
+// ---- submit with progress ----
+function send(fd, onProgress){
+  return new Promise((resolve,reject)=>{
+    if(DEMO){
+      let p=0; const t=setInterval(()=>{ p+=12; onProgress(Math.min(p,100));
+        if(p>=100){ clearInterval(t); resolve({preview_url:"https://khojdoot.example/shop/"+slug()}); } },180);
+      return;
+    }
+    const x=new XMLHttpRequest();
+    x.open("POST",API_BASE+"/ingest");
+    x.upload.onprogress=e=>{ if(e.lengthComputable) onProgress(e.loaded/e.total*100); };
+    x.onload=()=>{
+      if(x.status<200||x.status>=300) return reject(new Error("Server said "+x.status));
+      try{ resolve(JSON.parse(x.responseText)); }catch(_){ reject(new Error("Server reply was not JSON")); }
+    };
+    x.onerror=()=>reject(new TypeError("network"));
+    x.send(fd);
+  });
+}
+$("go").onclick = async ()=>{
+  const fd=new FormData();
+  fd.append("name",$("name").value.trim());
+  fd.append("phone",$("phone").value);
+  fd.append("city",$("city").value.trim());
+  fd.append("slug",slug());
+  files.forEach((f,i)=>fd.append("photos",f.blob,f.blob.name||("photo"+(i+1)+".jpg")));
+  $("go").disabled=true; $("backBtn").disabled=true; $("go").textContent="Creating your shop...";
+  $("m2").textContent=""; $("bar").classList.add("show"); $("barIn").style.width="0";
+  try{
+    const data = await send(fd,p=>$("barIn").style.width=p+"%");
+    let link = data.preview_url||data.previewUrl||data.preview_link||data.url||data.link;
+    if(!link && data.slug) link = API_BASE+"/preview/"+data.slug;
+    if(!link) throw new Error("No preview link came back");
+    $("link").textContent=link; $("link").href=link;
+    $("wa").href="https://wa.me/?text="+encodeURIComponent("See my shop on Khoj Doot: "+link);
+    show(3);
+  }catch(err){
+    $("m2").textContent = err instanceof TypeError
+      ? "Could not reach the server at "+API_BASE+". Is the backend running and does it allow CORS?"
+      : "Could not create the shop: "+err.message;
+    console.error(err);
+  }finally{
+    $("go").disabled=false; $("backBtn").disabled=false; $("go").textContent="Create my shop";
+    $("bar").classList.remove("show");
+  }
+};
+$("copy").onclick=async()=>{
+  try{ await navigator.clipboard.writeText($("link").textContent); $("copy").textContent="Copied"; }
+  catch(_){ $("copy").textContent="Press and hold the link to copy"; }
+  setTimeout(()=>$("copy").textContent="Copy link",2000);
+};
+$("again").onclick=()=>{
+  files.forEach(f=>URL.revokeObjectURL(f.url)); files=[]; renderThumbs();
+  ["name","phone","city"].forEach(id=>$(id).value=""); $("slugOut").textContent="–"; show(0);
+};
+show(0);
+</script>
+</body>
+</html>
