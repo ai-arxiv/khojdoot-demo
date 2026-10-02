@@ -1,0 +1,423 @@
+{
+  "shops": [
+    {
+      "sme_id": "SME001",
+      "name": "Rashmi's Homemade Food",
+      "category": "Homemade Food",
+      "city": "Nashik",
+      "state": "Maharashtra",
+      "phone": "9561383803",
+      "address": "Flat No. 06, 6th Floor, Shital Tower, Sambhaji Stadium Rd, Near Devang Dairy, Ashwin Nagar, Nashik, Maharashtra 422009",
+      "slug": "rashmis-homemade-food",
+
+      "photos": [
+        "image/SME001_01_homemade-food.jpg.jpg",
+        "image/SME001_02_prepared-meal.jpg.jpg",
+        "image/SME001_03_homemade-dish.jpg.jpg",
+        "image/SME001_04_food-packaging.jpg.jpg"
+      ],
+
+      "profile": {
+        "name": "Rashmi's Homemade Food",
+        "category": "Homemade Food",
+        "city": "Nashik",
+        "state": "Maharashtra"
+      },
+
+      "product_shot": [
+        "Homemade food",
+        "Prepared dishes"
+      ],
+
+      "rate": [
+        "₹500 for two"
+      ],
+
+      "does_not_do": [],
+
+      "date": "2026-10-02",
+      "source": "Shop information provided for Khoj Doot seed data"
+    },
+
+    {
+      "sme_id": "SME002",
+      "name": "Annapurna Home Made Food Services (Pure Veg)",
+      "category": "Homemade Food / Tiffin Service",
+      "city": "Nashik",
+      "state": "Maharashtra",
+      "phone": "9420692873",
+      "address": "2, Suman Pride, Wadje Mala, Behind Shiva Hotel, Dindori Road, Mhasrul Gaon, Nashik, Maharashtra 422004",
+      "slug": "annapurna-home-made-food",
+
+      "photos": [
+        "image/SME002_01_tiffin-meal.jpg.jpg",
+        "image/SME002_02_maharashtrian-food.jpg.jpg",
+        "image/SME002_03_homemade-thali.jpg.jpg",
+        "image/SME002_04_food-delivery-tiffin.jpg.jpg"
+      ],
+
+      "profile": {
+        "name": "Annapurna Home Made Food Services (Pure Veg)",
+        "category": "Homemade Food / Tiffin Service",
+        "city": "Nashik",
+        "state": "Maharashtra"
+      },
+
+      "product_shot": [
+        "Tiffin service",
+        "Homemade food",
+        "Meal delivery",
+        "Food producer"
+      ],
+
+      "rate": [
+        "₹180 per day",
+        "₹800 for two"
+      ],
+
+      "does_not_do": [],
+
+      "date": "2026-10-02",
+      "source": "Shop information provided for Khoj Doot seed data"
+    },
+
+    {
+      "sme_id": "SME003",
+      "name": "Medha Kulkarni's Homemade Food Services - Ashirwad Gruh Udyog",
+      "category": "Homemade Food",
+      "city": "Nashik",
+      "state": "Maharashtra",
+      "phone": "",
+      "address": "22, Ashirwad Bungalow, Narayan Park, Kala Nagar, Gurukrupa Society Road, Nashik, Maharashtra 422009",
+      "slug": "medha-kulkarni-homemade-food",
+
+      "photos": [
+        "image/SME003_01_homemade-food.jpg.jpg",
+        "image/SME003_02_home-style-meal.jpg.jpg",
+        "image/SME003_03_prepared-dish.jpg.jpg",
+        "image/SME003_04_food-delivery.jpg.jpg"
+      ],
+
+      "profile": {
+        "name": "Medha Kulkarni's Homemade Food Services - Ashirwad Gruh Udyog",
+        "category": "Homemade Food",
+        "city": "Nashik",
+        "state": "Maharashtra"
+      },
+
+      "product_shot": [
+        "Homemade food",
+        "Homemade food delivery",
+        "Home-style food"
+      ],
+
+      "rate": [
+        "Rates on request"
+      ],
+
+      "does_not_do": [],
+
+      "date": "2026-10-02",
+      "source": "Shop information provided for Khoj Doot seed data"
+    },
+
+    {
+      "sme_id": "SME004",
+      "name": "Maiga Handicrafts",
+      "category": "Handicrafts / Traditional Lanterns",
+      "city": "Nashik",
+      "state": "Maharashtra",
+      "phone": "0253-2598321",
+      "address": "2047, Nehru Chowk, Somwar Peth, Nashik, Maharashtra 422001",
+      "slug": "maiga-handicrafts",
+
+      "photos": [
+        "image/SME004_01_sky-lantern.jpg.jpg",
+        "image/SME004_02_handmade-lantern.jpg.jpg",
+        "image/SME004_03_traditional-lantern.jpg.jpg",
+        "image/SME004_04_metal-lantern.jpg.jpg"
+      ],
+
+      "profile": {
+        "name": "Maiga Handicrafts",
+        "category": "Handicrafts / Traditional Lanterns",
+        "city": "Nashik",
+        "state": "Maharashtra"
+      },
+
+      "product_shot": [
+        "Plain Sky Lanterns",
+        "Handmade Round Lanterns",
+        "Printed Sky Lanterns",
+        "Toran Karanji Lanterns",
+        "Handmade Traditional Lanterns",
+        "Eco Friendly Lanterns",
+        "Hanging Lantern",
+        "Metal Lantern",
+        "Heart Sky Lantern Paper"
+      ],
+
+      "rate": [
+        "Hanging Lantern: ₹150–₹180 per unit",
+        "Metal Lantern: ₹150–₹180 per piece",
+        "Hanging Lantern: ₹402–₹1,000 per unit",
+        "Metal Lantern: ₹215–₹516 per piece"
+      ],
+
+      "does_not_do": [],
+
+      "date": "2026-10-02",
+      "source": "Shop information provided for Khoj Doot seed data"
+    },
+
+    {
+      "sme_id": "SME005",
+      "name": "Jayshree Handmade Creation",
+      "category": "Handmade / Fashion / Jewellery",
+      "city": "Nashik",
+      "state": "Maharashtra",
+      "phone": "9137874035",
+      "address": "Soham Apartment, Near Royal Town, Gamane Mala, Shanti Nagar, Makhmalabad, Nashik, Maharashtra 422003",
+      "slug": "jayshree-handmade-creation",
+
+      "photos": [
+        "image/SME005_01_handmade-fashion.jpg",
+        "image/SME005_02_handmade-jewellery.jpg",
+        "image/SME005_03_fashion-accessories.jpg",
+        "image/SME005_04_handmade-creation.jpg"
+      ],
+
+      "profile": {
+        "name": "Jayshree Handmade Creation",
+        "category": "Handmade / Fashion / Jewellery",
+        "city": "Nashik",
+        "state": "Maharashtra"
+      },
+
+      "product_shot": [
+        "Handmade fashion products",
+        "Handmade jewellery",
+        "Fashion accessories"
+      ],
+
+      "rate": [],
+
+      "does_not_do": [],
+
+      "date": "2026-10-02",
+      "source": "Shop information provided for Khoj Doot seed data"
+    },
+
+    {
+      "sme_id": "SME006",
+      "name": "Crafts by Sujatha Candle Studio",
+      "category": "Handmade Candles / Crafts",
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "phone": "",
+      "address": "2nd Floor, Shilpa Paradise, Main Road, Pragathi Nagar Road, Near IDEAL Kitchen, Kakatiya Hills, Pragathi Nagar, Gajularamaram, Hyderabad, Telangana 500090",
+      "slug": "crafts-by-sujatha",
+
+      "photos": [
+        "image/SME006_01_scented-candle.jpg",
+        "image/SME006_02_handmade-candle.jpg",
+        "image/SME006_03_home-fragrance.jpg",
+        "image/SME006_04_reed-diffuser.jpg"
+      ],
+
+      "profile": {
+        "name": "Crafts by Sujatha Candle Studio",
+        "category": "Handmade Candles / Crafts",
+        "city": "Hyderabad",
+        "state": "Telangana"
+      },
+
+      "product_shot": [
+        "Handmade candles",
+        "Scented candles",
+        "Home fragrance products",
+        "Room fresheners",
+        "Reed diffusers",
+        "Bath salts"
+      ],
+
+      "rate": [],
+
+      "does_not_do": [],
+
+      "date": "2026-10-02",
+      "source": "Shop information provided for Khoj Doot seed data"
+    },
+
+    {
+      "sme_id": "SME007",
+      "name": "Nisha Handicraft",
+      "category": "Clothing / Handicraft",
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "phone": "9177381050",
+      "address": "S.No 9, 10, Suryalok Complex, King Koti Road, Gun Foundry, Basheer Bagh, Hyderabad, Telangana 500001",
+      "slug": "nisha-handicraft",
+
+      "photos": [
+        "image/SME007_01_casual-tops.jpg",
+        "image/SME007_02_casual-trousers.jpg",
+        "image/SME007_03_dress-material.jpg",
+        "image/SME007_04_handicraft-clothing.jpg"
+      ],
+
+      "profile": {
+        "name": "Nisha Handicraft",
+        "category": "Clothing / Handicraft",
+        "city": "Hyderabad",
+        "state": "Telangana"
+      },
+
+      "product_shot": [
+        "Casual Tops & Tees",
+        "Casual Trousers",
+        "Dress Material",
+        "Designer clothing",
+        "Embroidery work"
+      ],
+
+      "rate": [],
+
+      "does_not_do": [],
+
+      "date": "2026-10-02",
+      "source": "Shop information provided for Khoj Doot seed data"
+    },
+
+    {
+      "sme_id": "SME008",
+      "name": "Thread Bangles by Ramya",
+      "category": "Handmade Silk-Thread Bangles",
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "phone": "8328545403",
+      "address": "Umadevi House, Opposite Denny Gifts and Frames, Rajnagar, SRT Nagar, Borabanda, Hyderabad, Telangana 500018",
+      "slug": "thread-bangles-by-ramya",
+
+      "photos": [
+        "image/SME008_01_silk-thread-bangles.jpg",
+        "image/SME008_02_handmade-bangles.jpg",
+        "image/SME008_03_custom-bangles.jpg",
+        "image/SME008_04_bangle-designs.jpg"
+      ],
+
+      "profile": {
+        "name": "Thread Bangles by Ramya",
+        "category": "Handmade Silk-Thread Bangles",
+        "city": "Hyderabad",
+        "state": "Telangana"
+      },
+
+      "product_shot": [
+        "Customised handmade silk-thread bangles",
+        "Handmade bangles"
+      ],
+
+      "rate": [],
+
+      "does_not_do": [],
+
+      "additional_reliable_fact": [
+        "Free delivery within Hyderabad",
+        "Dispatch requires 4–5 days"
+      ],
+
+      "date": "2026-10-02",
+      "source": "Shop information provided for Khoj Doot seed data"
+    },
+
+    {
+      "sme_id": "SME009",
+      "name": "Vigneshwara Computer Embroidery Designs Works",
+      "category": "Computer Embroidery / Tailoring",
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "phone": "9949782843",
+      "address": "70/A, Flat No. 301, Krish Elite Apartment, Gokulplots, Venkataramana Colony, Beside Telangana Minority Girls School, Vasanth Nagar, Hyderabad, Telangana",
+      "slug": "vigneshwara-embroidery",
+
+      "photos": [
+        "image/SME009_01_computer-embroidery.jpg.jpg",
+        "image/SME009_02_designer-blouse.jpg.jpg",
+        "image/SME009_03_maggam-work.jpg.jpg",
+        "image/SME009_04_tailoring-work.jpg.jpg"
+      ],
+
+      "profile": {
+        "name": "Vigneshwara Computer Embroidery Designs Works",
+        "category": "Computer Embroidery / Tailoring",
+        "city": "Hyderabad",
+        "state": "Telangana"
+      },
+
+      "product_shot": [
+        "Computer embroidery works",
+        "Designer blouse work",
+        "Pico fall stitching",
+        "Ladies tailoring",
+        "Maggam work"
+      ],
+
+      "rate": [
+        "Ask for price / quotation"
+      ],
+
+      "does_not_do": [],
+
+      "date": "2026-10-02",
+      "source": "Shop information provided for Khoj Doot seed data"
+    },
+
+    {
+      "sme_id": "SME010",
+      "name": "Paras Handicrafts",
+      "category": "Handmade Handicrafts / Home Decor",
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "phone": "9959548228",
+      "address": "Beside R K Plaza, Feelkhana, Begum Bazar, Hyderabad, Telangana 500012",
+      "slug": "paras-handicrafts",
+
+      "photos": [
+        "image/SME010_01_bird-nest.jpg.jpg",
+        "image/SME010_02_birdhouse.jpg.jpg",
+        "image/SME010_03_mirror-flower-vase.jpg.jpg",
+        "image/SME010_04_handmade-pot.jpg.jpg"
+      ],
+
+      "profile": {
+        "name": "Paras Handicrafts",
+        "category": "Handmade Handicrafts / Home Decor",
+        "city": "Hyderabad",
+        "state": "Telangana"
+      },
+
+      "product_shot": [
+        "Handmade bird nests",
+        "Birdhouses",
+        "Bird nest decorations",
+        "Mirror-studded flower vases",
+        "Handmade flower pots",
+        "Clay handicraft items",
+        "Clay handicraft toys"
+      ],
+
+      "rate": [
+        "Ask for price / quotation"
+      ],
+
+      "does_not_do": [
+        "Large/regular stock cannot be assumed",
+        "Limited stock reported"
+      ],
+
+      "date": "2026-10-02",
+      "source": "Shop information provided for Khoj Doot seed data"
+    }
+  ]
+}
