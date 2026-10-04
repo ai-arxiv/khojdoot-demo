@@ -1,4 +1,4 @@
-CREATE TABLE shops (
+CREATE TABLE IF NOT EXISTS shops (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     sme_id TEXT,
     slug TEXT UNIQUE,
@@ -8,14 +8,14 @@ CREATE TABLE shops (
     updated_at TEXT
 );
 
-CREATE TABLE photos (
+CREATE TABLE IF NOT EXISTS photos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     shop_id INTEGER NOT NULL,
     filename TEXT,
     FOREIGN KEY (shop_id) REFERENCES shops(id)
 );
 
-CREATE TABLE bins (
+CREATE TABLE IF NOT EXISTS bins (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     shop_id INTEGER NOT NULL,
     bin_type TEXT,
