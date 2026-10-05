@@ -112,7 +112,7 @@ a.wa{background:#1f9d55;color:#fff;border-radius:12px;padding:14px 18px;font-wei
       <button class="sec" id="copy">Copy link</button>
       <a class="wa" id="wa" target="_blank" rel="noopener">Share on WhatsApp</a>
     </div>
-    <div class="row"><button class="sec" id="again" style="flex:1">Add another shop</button></div>
+    <div class="row c"><a class="wa" href="/labs" style="background:#243b8f">Watch pipeline</a><button class="sec" id="again">Add another shop</button></div>
   </section>
 
   <p class="fb">Backup path: use this form if WhatsApp is not working.</p>
@@ -120,11 +120,14 @@ a.wa{background:#1f9d55;color:#fff;border-radius:12px;padding:14px 18px;font-wei
 
 <script>
 // ---- ONE LINE TO CHANGE: your backend address ----
-const API_BASE = "http://localhost:8000";
+const API_BASE = location.protocol === "file:" ? "http://localhost:8000" : "";  // "" = same address the page came from
 // Add ?demo=1 to the page address to try the screens without a server.
 // ---------------------------------------------------
 const DEMO = new URLSearchParams(location.search).has("demo");
 const MAX = 8;
+// Abhishek's backend: shop is created first (POST /smes), then photos go to POST /ingest.
+// Set to false if /ingest creates the shop itself (one call).
+const TWO_STEP = true;
 const $ = id => document.getElementById(id);
 const panes = [...document.querySelectorAll(".pane")];
 const stepEls = [...$("steps").children];
@@ -241,6 +244,17 @@ function send(fd, onProgress){
     x.send(fd);
   });
 }
+async function createShop(){
+  // Sends every field either backend may ask for (extra fields are ignored by the one that doesn't need them)
+  const mySlug = slug();
+  const r = await fetch(API_BASE+"/smes",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({name:$("name").value.trim(),phone:$("phone").value,city:$("city").value.trim(),
+      slug:mySlug,sme_id:mySlug,updated_at:new Date().toISOString()})});
+  if(r.status===409) return {slug: makeSlug($("name").value,"")};   // shop already exists: add photos to it
+  if(!r.ok) throw new Error("Could not create the shop (server said "+r.status+")");
+  const j = await r.json();
+  return {slug: j.slug || mySlug};
+}
 $("go").onclick = async ()=>{
   const fd=new FormData();
   fd.append("name",$("name").value.trim());
@@ -251,16 +265,18 @@ $("go").onclick = async ()=>{
   $("go").disabled=true; $("backBtn").disabled=true; $("go").textContent="Creating your shop...";
   $("m2").textContent=""; $("bar").classList.add("show"); $("barIn").style.width="0";
   try{
+    if(TWO_STEP && !DEMO){ const s = await createShop(); fd.set("slug", s.slug); }
     const data = await send(fd,p=>$("barIn").style.width=p+"%");
     let link = data.preview_url||data.previewUrl||data.preview_link||data.url||data.link;
-    if(!link && data.slug) link = API_BASE+"/preview/"+data.slug;
+    if(!link) link = new URL("card.html?slug="+encodeURIComponent(data.slug||fd.get("slug")), location.href).href;
+    link = new URL(link, API_BASE||location.origin).href;
     if(!link) throw new Error("No preview link came back");
     $("link").textContent=link; $("link").href=link;
     $("wa").href="https://wa.me/?text="+encodeURIComponent("See my shop on Khoj Doot: "+link);
     show(3);
   }catch(err){
     $("m2").textContent = err instanceof TypeError
-      ? "Could not reach the server at "+API_BASE+". Is the backend running and does it allow CORS?"
+      ? "Could not reach the server at "+(API_BASE||location.origin)+". Is the backend running and does it allow CORS?"
       : "Could not create the shop: "+err.message;
     console.error(err);
   }finally{
