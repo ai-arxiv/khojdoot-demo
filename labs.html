@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KhojDoot Labs</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#10162b;color:#e8ecf8;font:16px/1.5 system-ui,sans-serif}
+main{max-width:780px;margin:0 auto;padding:18px}
+h1{margin:0}.sub{color:#8d97b8;margin:0 0 14px}
+.mode{display:inline-block;font-size:.8rem;font-weight:600;padding:3px 10px;border-radius:99px;background:#26305a;color:#ffc247;margin-bottom:14px}
+.add{display:flex;gap:8px;margin-bottom:16px}
+.add input{flex:1;min-width:0;padding:11px 12px;font:inherit;border-radius:10px;border:2px solid #26305a;background:#1a2342;color:#e8ecf8}
+.add button{padding:11px 16px;font:inherit;font-weight:600;border:0;border-radius:10px;background:#f0a000;color:#10162b;cursor:pointer}
+.shop{background:#1a2342;border-radius:14px;padding:14px;margin-bottom:12px}
+.shop .top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.shop a{color:#ffc247;font-weight:600;text-decoration:none;word-break:break-word}
+.shop .x{background:none;border:0;color:#8d97b8;font-size:1.1rem;cursor:pointer}
+.pipe{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:10px}
+.st{font-size:.72rem;text-align:center;padding:8px 2px;border-radius:8px;background:#26305a;color:#8d97b8;transition:background .4s}
+.st.done{background:#1f7a4d;color:#fff}
+.st.running{background:#f0a000;color:#10162b;font-weight:600;animation:p 1s infinite}
+@keyframes p{50%{opacity:.55}}
+.note{color:#8d97b8;font-size:.82rem;margin-top:8px}
+.empty,.err{color:#8d97b8}.err{color:#ff8a80;font-weight:600}
+@media(max-width:520px){.pipe{grid-template-columns:repeat(2,1fr)}.st{font-size:.82rem}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <h1>KhojDoot Labs</h1>
+  <p class="sub">Live pipeline status for each merchant. Refreshes every 2 seconds.</p>
+  <div class="mode" id="mode">Starting...</div>
+  <div class="add"><input id="slugIn" placeholder="Shop link name, e.g. suman-pottery-jaipur"><button id="addBtn">Watch</button></div>
+  <div id="list" class="empty">Add a shop link name above to watch it. Add ?demo=1 to the address to see a simulated run.</div>
+</main>
+<script>
+// ---------- settings ----------
+const API = location.protocol === "file:" ? "http://localhost:8000" : "";   // "" = same address the page came from
+const DEMO = new URLSearchParams(location.search).has("demo");
+
+// The 6 states from the TRD, in order. Backend "status" values are matched against KEYS.
+const STAGES = ["Draft", "Processing", "Validated", "Pending approval", "Approved", "Published"];
+const KEYS   = ["DRAFT", "PROCESSING", "VALIDATED", "PENDING_APPROVAL", "APPROVED", "PUBLISHED"];
+
+// ---------- logic (no page code in here) ----------
+function idxOf(status){ return KEYS.indexOf(String(status || "").toUpperCase().replace(/[\s-]+/g, "_")); }
+function statesFor(idx){   // idx = current stage; the last stage counts as finished
+  return STAGES.map((_, i) => i < idx || idx === STAGES.length - 1 ? "done" : i === idx ? "running" : "waiting");
+}
+async function getJson(url){
+  try{ const r = await fetch(url); return r.ok ? await r.json() : null; }catch(_){ return null; }
+}
+// Returns {idx, note, name} or null if the shop is not found.
+async function stageOf(slug, api){
+  const e = encodeURIComponent(slug);
+  const st = await getJson(api + "/smes/" + e + "/status");            // backend with a status endpoint
+  if(st && st.status){
+    const i = idxOf(st.status);
+    return i >= 0 ? {idx:i, note:"", name:slug} : {idx:0, note:"Unknown status: " + st.status, name:slug};
+  }
+  const shop = (await getJson(api + "/b/" + e + ".json")) || (await getJson(api + "/b/" + e));   // shop exists?
+  if(shop && !(shop.message && !shop.name && !shop.business_name))
+    return {idx:0, note:"Shop found. This backend has no status endpoint yet, so later stages cannot be shown.", name: shop.name || shop.business_name || slug};
+  return null;
+}
+
+// ---------- page code ----------
+const $ = id => document.getElementById(id);
+const el = (t, props={}, kids=[]) => { const n = Object.assign(document.createElement(t), props); kids.forEach(k => n.append(k)); return n; };
+let watched = [];
+try{ watched = JSON.parse(localStorage.getItem("kd_watch") || "[]"); }catch(_){}
+const save = () => { try{ localStorage.setItem("kd_watch", JSON.stringify(watched)); }catch(_){} };
+
+function card(name, slug, states, note, removable){
+  const top = el("div",{className:"top"},[ el("a",{href:"card.html?slug="+encodeURIComponent(slug),textContent:name}) ]);
+  if(removable) top.append(el("button",{className:"x",title:"Stop watching",textContent:"×",onclick:()=>{ watched = watched.filter(s => s !== slug); save(); tick(); }}));
+  const pipe = el("div",{className:"pipe"}, states.map((s,i) => el("div",{className:"st "+s,textContent:STAGES[i]})));
+  const box = el("div",{className:"shop"},[top, pipe]);
+  if(note) box.append(el("div",{className:"note",textContent:note}));
+  return box;
+}
+function show(items, mode){
+  $("mode").textContent = mode;
+  $("list").className = "";
+  $("list").replaceChildren(...(items.length ? items : [el("p",{className:"empty",textContent:"Add a shop link name above to watch it."})]));
+}
+
+let demoStart = Date.now();
+async function tick(){
+  if(DEMO){
+    const idx = Math.min(5, Math.floor((Date.now() - demoStart) / 2000));
+    if(Date.now() - demoStart > 16000) demoStart = Date.now();
+    return show([card("Suman Pottery (demo)", "suman-pottery-jaipur", statesFor(idx), "", false)], "Demo mode: simulated run");
+  }
+  // 1. stand-in backend with a ready-made list
+  const pipe = await getJson(API + "/api/pipeline");
+  if(pipe && Array.isArray(pipe.shops)){
+    const stages = pipe.stages || STAGES;
+    return show(pipe.shops.map(s => {
+      const c = card(s.name, s.slug, s.stages, "", false);
+      c.querySelectorAll(".st").forEach((n,i) => n.textContent = stages[i] || "");
+      return c;
+    }), "Live: all shops from /api/pipeline");
+  }
+  // 2. any other backend: poll the shops you chose to watch
+  const items = [];
+  for(const slug of watched){
+    const r = await stageOf(slug, API);
+    items.push(r ? card(r.name, slug, statesFor(r.idx), r.note, true)
+                 : el("div",{className:"shop"},[el("span",{className:"err",textContent:slug + ": shop not found"}), el("button",{className:"x",textContent:"×",onclick:()=>{ watched = watched.filter(s => s !== slug); save(); tick(); }})]));
+  }
+  show(items, "Live: watching " + watched.length + " shop(s)");
+}
+$("addBtn").onclick = () => {
+  const s = $("slugIn").value.trim().toLowerCase();
+  if(s && !watched.includes(s)){ watched.unshift(s); save(); }
+  $("slugIn").value = ""; tick();
+};
+$("slugIn").addEventListener("keydown", e => { if(e.key === "Enter") $("addBtn").click(); });
+const fromUrl = new URLSearchParams(location.search).get("slug");
+if(fromUrl && !watched.includes(fromUrl)){ watched.unshift(fromUrl); save(); }
+tick(); setInterval(tick, 2000);
+</script>
+</body>
+</html>
