@@ -1,23 +1,24 @@
-# KhojDoot Team Review & Action Plan (Oct 4 – Oct 8)
+# KhojDoot Team Review & Action Plan v2.0 (Oct 4 – Oct 8)
 
 **Target Hackathon Demo:** October 9–10, 2026  
-**Document Purpose:** Code audit against PRD/TRD specifications, contract reconciliation, beginner mistake prevention, and 5-day team execution checklist.
+**Problem Statement:** PS-29 — Regional-Language No-Code Website Creation Platform  
+**Document Purpose:** Code audit against PRD v2.0 & TRD v2.0, contract reconciliation, beginner mistake prevention, and 5-day team execution checklist.
 
 ---
 
 ## 1. Executive Summary & Team Code Audit
 
-This review analyzes the current branch contributions (`origin/abhishek`, `origin/Shantanu(Database)`, `origin/gayatri-deore`, `origin/sakshikhule`) against the **PRD v1.0** and **TRD v1.0** specifications.
+This review updates the team action plan to align with **PRD v2.0** and **TRD v2.0**. The technical roles remain identical, but each role now includes responsibilities for **WebsiteSpec, Component Directory, Website Generator, Website Validation, and Conversational Editing**.
 
 ### Summary Matrix
 
-| Team Member | Domain / TRD Role | GitHub Status | Major Strength | Critical Fix Required Before Merge |
-|---|---|---|---|---|
-| **Abhishek** | FastAPI Backend & Webhook | Contributed | Clean FastAPI routing & structure | Align `POST /ingest` with Gayatri's form & Shantanu's DB schema |
-| **Shantanu** | Database & Persistence | Contributed | Indexed SQLite schema design | Reconcile `shops` & `bins` table columns with Abhishek |
-| **Gayatri** | Web UI & Frontend | Contributed | Client-side photo compression & 3-step UX | Parameterize `API_BASE` URL and support multi-part form contract |
-| **Paksha** | AI Processing (Sarvam/Jev/Gemini) | **NO COMMITS FLAGGED** | N/A | Must build TRD AI services (`sarvam.py`, `gemini.py`) |
-| **Sakshi** | QA & Multilingual Testing | Contributed | High-quality 10 SME seed records | Expand test matrix across Marathi voice notes & edge cases |
+| Team Member | Domain / TRD Role | Primary Target (PRD v2.0 / TRD v2.0) | Critical Task Before Oct 9 Demo |
+|---|---|---|---|
+| **Abhishek** | FastAPI Backend | Website creation APIs (`POST /website/generate`, `POST /website/edit`) | Reconcile `/ingest` contract and implement `WebsiteSpec` endpoints |
+| **Shantanu** | Database & Persistence | `WebsiteSpec`, `WebsiteVersion`, `ValidationResult` persistence | Extend SQLite tables for `WebsiteSpec` and validation metrics |
+| **Gayatri** | Web UI & Frontend | Website Preview, Component Directory, Conversational Editor | Build responsive website renderer (`/merchant/[slug]`) & edit controls |
+| **Paksha** | AI Processing (Sarvam/Gemini) | Requirement understanding, `WebsiteSpec` generation, Skills | Build `app/ai/sarvam.py`, `app/ai/gemini.py` & Website Planner Skill |
+| **Sakshi** | QA & Validation | Website Validator (Structural/Technical/Content/Mobile) | Build validation check suite (`8/8 checks passed`) & evidence matrix |
 
 ---
 
@@ -32,50 +33,48 @@ Every team member must read these rules derived from our technical post-mortem:
 >    Windows terminals default to `cp1252` encoding. When logging Marathi Devanagari text (`नमस्कार`, `टिफिन`), Python will crash with `UnicodeEncodeError`. Ensure `sys.stdout.reconfigure(encoding="utf-8")` is included at app startup.
 > 3. **Never Swallow Exceptions Silently:**  
 >    Avoid empty `try: ... except: pass` blocks. Always log errors explicitly so bugs are caught immediately during testing.
-> 4. **No Hardcoded Base URLs:**  
->    Replace hardcoded `http://localhost:8000` strings with configurable environment variables or relative paths.
+> 4. **Edit the Specification (WebsiteSpec), Not Arbitrary Code:**  
+>    Do not allow LLMs to generate uncontrolled raw HTML/JS from scratch. Use `WebsiteSpec` JSON patches and a bounded `Component Directory` to ensure deterministic rendering.
 
 ---
 
-## 3. Detailed Member Analysis & Learning Strategy
+## 3. Detailed Member Analysis & Learning Strategy (PRD v2.0 / TRD v2.0)
 
-### 3.1 Abhishek — FastAPI & Backend Runtime
+### 3.1 Abhishek — FastAPI Backend Owner
 
-#### Current Code vs TRD Audit
-- **Good:** Abhishek built clean FastAPI endpoints (`POST /smes`, `POST /ingest`, `GET /b/{slug}.json`).
-- **Conflict:** Abhishek's `/ingest` endpoint expects a 2-step flow (create shop via `/smes` first, then upload photos via `/ingest`). Gayatri's frontend sends everything in a single request.
-- **Contract Fix:** Update `/ingest` to auto-create the shop if `name`, `phone`, and `city` are provided in the `FormData`.
+#### Key TRD v2.0 Deliverables
+- **Endpoints:** Implement `POST /merchants/{id}/website/generate`, `GET /merchants/{id}/website`, `POST /merchants/{id}/website/edit`, `POST /merchants/{id}/website/validate`, `POST /merchants/{id}/publish`.
+- **Integrations:** Connect Paksha's AI Website Planner, Shantanu's WebsiteSpec persistence, and Gayatri's editor.
 
 #### 3-Tier Skill Strategy (2 Hours/Day)
 * **Must Learn Manually (Do NOT rely on AI):**
-  - FastAPI Request Lifecycle: How `Form()`, `File()`, and `Header()` params parse incoming HTTP bodies.
-  - Python `async/await` syntax and background tasks (`BackgroundTasks`).
+  - FastAPI Request Lifecycle: Handling `Form()`, `File()`, and JSON body payloads.
+  - Asynchronous background task dispatching (`BackgroundTasks`).
 * **Learn Enough to Understand:**
   - Meta Cloud API HTTP payload formats and webhook challenge handshakes.
-  - Pydantic schema validation errors (`422 Unprocessable Entity`).
+  - RESTful contract design for `WebsiteSpec` patches.
 * **Delegate to AI:**
   - Writing boilerplate CRUD SQL queries and Pydantic model definitions.
 
 #### Daily Checklist (Oct 4 – Oct 8)
 - [ ] **Oct 4:** Reconcile `/ingest` route to accept `name`, `phone`, `city`, `slug`, and `photos` in one request.
-- [ ] **Oct 5:** Connect Shantanu's database helper functions into `main.py`.
-- [ ] **Oct 6:** Integrate Paksha's Gemini & Sarvam AI extractors into the backend processing flow.
-- [ ] **Oct 7:** Build Meta WhatsApp Webhook endpoint (`GET` handshake + `POST` inbound receiver).
-- [ ] **Oct 8:** End-to-end testing with Sakshi; verify P0 backend runtime stability.
+- [ ] **Oct 5:** Build `POST /website/generate` endpoint consuming Paksha's AI `WebsiteSpec`.
+- [ ] **Oct 6:** Build `POST /website/edit` endpoint applying natural-language `WebsiteSpec` patches.
+- [ ] **Oct 7:** Connect Sakshi's Website Validator and Meta WhatsApp Webhook.
+- [ ] **Oct 8:** End-to-end testing with Sakshi; verify backend runtime stability.
 
 ---
 
-### 3.2 Shantanu — Database & InfoBin Persistence
+### 3.2 Shantanu — Database & Persistence Owner
 
-#### Current Code vs TRD Audit
-- **Good:** Shantanu defined `schema.sql` with indexed tables (`shops`, `bins`, `photos`).
-- **Conflict:** `shops` table is missing `sme_id` in Abhishek's backend code. `bins` table in `schema.sql` uses `bin_type` for multi-row bins, whereas Abhishek's backend stores a single JSON blob (`UNIQUE(shop_id)`).
-- **Contract Fix:** Unify `bins` schema to support both single-blob InfoBin storage (`data`) and `bin_type` indexing.
+#### Key TRD v2.0 Deliverables
+- **Persistence Tables:** Add `website_specs`, `website_versions`, `validation_results`, and `generation_metrics` tables to SQLite (`schema.sql`).
+- **Data Integrity:** Keep `InfoBin` as canonical business truth; ensure `WebsiteSpec` references `InfoBin` records without duplicate fields.
 
 #### 3-Tier Skill Strategy (2 Hours/Day)
 * **Must Learn Manually (Do NOT rely on AI):**
   - SQLite foreign key constraints (`FOREIGN KEY (shop_id) REFERENCES shops(id)`).
-  - Basic SQL indexing (`CREATE INDEX idx_shops_slug ON shops(slug)`).
+  - Basic SQL indexing (`CREATE INDEX idx_specs_shop ON website_specs(shop_id)`).
 * **Learn Enough to Understand:**
   - SQLite JSON functions (`json_extract()`) and JSON column storage.
   - Context managers for database connections (`with sqlite3.connect(...) as conn:`).
@@ -84,19 +83,18 @@ Every team member must read these rules derived from our technical post-mortem:
 
 #### Daily Checklist (Oct 4 – Oct 8)
 - [ ] **Oct 4:** Merge `schema.sql` with Abhishek's backend database initialization script (`connection.py`).
-- [ ] **Oct 5:** Build `save_infobin()` and `get_infobin()` Python helper functions.
-- [ ] **Oct 6:** Implement `provenance` table to track extraction channels (`WhatsApp`, `Web`, `Voice`).
+- [ ] **Oct 5:** Build `save_website_spec()` and `get_website_spec()` Python helper functions.
+- [ ] **Oct 6:** Implement `validation_results` persistence for storing test evidence (`8/8 passed`).
 - [ ] **Oct 7:** Populate SQLite database with Sakshi's 10 SME seed profiles from `shops.json`.
 - [ ] **Oct 8:** Run load/query benchmark tests to ensure instant $O(1)$ slug lookups.
 
 ---
 
-### 3.3 Gayatri — Frontend & Web Interface
+### 3.3 Gayatri — Frontend & Website Interface Owner
 
-#### Current Code vs TRD Audit
-- **Good:** Gayatri created a high-quality 3-step onboarding UI (`Add Your Shop.html`) with client-side canvas photo compression and `?demo=1` mode.
-- **Conflict:** Hardcoded `API_BASE = "http://localhost:8000"`. Needs dynamic fallback when hosted on public domains.
-- **Contract Fix:** Update JS submit logic to handle response JSON structure cleanly and parameterize `API_BASE`.
+#### Key TRD v2.0 Deliverables
+- **Component Directory:** Build reusable Bounded Components (`Hero`, `About`, `Services`, `Products`, `Gallery`, `Location`, `Contact`, `Footer`).
+- **Interfaces:** Dynamic website renderer (`/merchant/[slug]`), Website Preview, Conversational Editor UI, and KhojDoot Labs telemetry (`/labs`).
 
 #### 3-Tier Skill Strategy (2 Hours/Day)
 * **Must Learn Manually (Do NOT rely on AI):**
@@ -104,28 +102,28 @@ Every team member must read these rules derived from our technical post-mortem:
   - DOM Event Listeners (`addEventListener`) and step navigation state management.
 * **Learn Enough to Understand:**
   - HTML5 Canvas image resizing (`createImageBitmap`) and Blob creation.
-  - CORS (Cross-Origin Resource Sharing) headers and how browsers enforce them.
+  - Dynamic component tree rendering driven by `WebsiteSpec` JSON.
 * **Delegate to AI:**
-  - Writing CSS animations, layout styling, and HTML layout scaffolding.
+  - Writing CSS animations, Tailwind styling, and HTML layout scaffolding.
 
 #### Daily Checklist (Oct 4 – Oct 8)
 - [ ] **Oct 4:** Parameterize `API_BASE` in `Add Your Shop.html` to support window location origins.
-- [ ] **Oct 5:** Connect web form submission to Abhishek's updated `/ingest` API endpoint.
-- [ ] **Oct 6:** Build the dynamic Khoj Card HTML template (`/b/{slug}`) displaying approved merchant facts.
-- [ ] **Oct 7:** Build KhojDoot Labs telemetry view (`/labs`) showing live 6-stage pipeline status.
+- [ ] **Oct 5:** Build Bounded Component Directory (`Hero`, `Products`, `Location`, `Contact`, `Footer`).
+- [ ] **Oct 6:** Build dynamic website renderer (`/merchant/[slug]`) consuming `WebsiteSpec`.
+- [ ] **Oct 7:** Build Conversational Editor UI ("Remove testimonials", "Make menu prominent") & KhojDoot Labs dashboard (`/labs`).
 - [ ] **Oct 8:** Verify mobile responsiveness across phone browsers for the demo.
 
 ---
 
-### 3.4 Paksha — AI Processing & Speech Extraction (FLAGGED)
+### 3.4 Paksha — AI Processing & Skills Owner (FLAGGED)
 
 > [!WARNING]
-> **Action Required:** Paksha currently has **zero commits** on GitHub. As per TRD Section 7, Paksha must take ownership of the AI processing pipeline immediately.
+> **Action Required:** Paksha currently has **zero commits** on GitHub. As per TRD v2.0 Section 7, Paksha must take ownership of the AI processing and requirement understanding pipeline immediately.
 
-#### Tasks to Claim from TRD
-- **Sarvam Saaras ASR (`app/ai/sarvam.py`):** Transcribe Marathi `.ogg` voice notes.
-- **Gemini 3.6 Flash (`app/ai/gemini.py`):** Extract structured business facts into InfoBin schema.
-- **Jev Intent Classifier (`app/ai/jev.py`):** Classify merchant onboarding intent.
+#### Key TRD v2.0 Deliverables
+- **Sarvam Saaras ASR (`app/ai/sarvam.py`):** Transcribe Marathi `.ogg` voice notes (`mr-IN`).
+- **Gemini 3.6 Flash (`app/ai/gemini.py`):** Extract structured business facts into `InfoBin` schema.
+- **AI Website Planner (`app/ai/planner.py`):** Convert regional-language requirement into `WebsiteSpec` JSON.
 
 #### 3-Tier Skill Strategy (2 Hours/Day)
 * **Must Learn Manually (Do NOT rely on AI):**
@@ -139,33 +137,33 @@ Every team member must read these rules derived from our technical post-mortem:
 
 #### Daily Checklist (Oct 4 – Oct 8)
 - [ ] **Oct 4:** Create `app/ai/sarvam.py` using Sarvam Saaras API (`language_code="mr-IN"`).
-- [ ] **Oct 5:** Create `app/ai/gemini.py` using `gemini-3.6-flash` with InfoBin JSON schema prompt.
-- [ ] **Oct 6:** Build fallback mechanism: if Gemini fails or is rate-limited, return clean default Marathi dictionary.
-- [ ] **Oct 7:** Connect AI extraction functions to Abhishek's backend processing pipeline.
+- [ ] **Oct 5:** Create `app/ai/gemini.py` using `gemini-3.6-flash` with InfoBin & WebsiteSpec JSON prompts.
+- [ ] **Oct 6:** Build natural-language edit parser: translate user edits ("Add phone number") into `WebsiteSpec` JSON patches.
+- [ ] **Oct 7:** Connect AI extraction & planning functions to Abhishek's backend processing pipeline.
 - [ ] **Oct 8:** Test voice transcription + Gemini extraction end-to-end on Sakshi's test audio files.
 
 ---
 
-### 3.5 Sakshi — QA, Validation & Test Matrix
+### 3.5 Sakshi — QA, Website Validation & Test Matrix Owner
 
-#### Current Code vs TRD Audit
-- **Good:** Sakshi provided 10 realistic SME seed profiles (`shops.json`), `FIELD-MAPPING.md`, and `DEMO-CHECKLIST.md`.
-- **Next Step:** Expand testing into active API validation scripts and edge case verification.
+#### Key TRD v2.0 Deliverables
+- **Website Validator (`app/website/validator.py`):** Implement structural, technical, content, mobile, and accessibility validation checks (`8/8 checks passed`).
+- **Evidence Matrix:** Maintain measurable validation evidence for competition decision support.
 
 #### 3-Tier Skill Strategy (2 Hours/Day)
 * **Must Learn Manually (Do NOT rely on AI):**
   - How to write basic Python `pytest` or `unittest` test functions.
-  - Validating JSON schemas against expected keys (`name`, `menu`, `location`).
+  - Validating `WebsiteSpec` JSON structures against expected component trees.
 * **Learn Enough to Understand:**
   - HTTP response status codes (`200 OK`, `400 Bad Request`, `422 Unprocessable`).
-  - Terminal cURL / Python HTTP client testing.
+  - Automated HTML assertion checks (checking if business name, phone, and menu items appear in rendered HTML).
 * **Delegate to AI:**
   - Generating sample test datasets and synthetic voice audio scripts.
 
 #### Daily Checklist (Oct 4 – Oct 8)
-- [ ] **Oct 4:** Create `tests/test_schema.py` to validate `shops.json` against InfoBin schema rules.
-- [ ] **Oct 5:** Create test cases for multilingual inputs (Marathi text, English text, mixed transliterated text).
-- [ ] **Oct 6:** Test photo upload edge cases (large images, unsupported file extensions, missing fields).
+- [ ] **Oct 4:** Create `tests/test_schema.py` to validate `shops.json` against InfoBin & WebsiteSpec schema rules.
+- [ ] **Oct 5:** Build `WebsiteValidator` suite checking required sections, contact fields, and link integrity.
+- [ ] **Oct 6:** Build edit-revalidation test suite: verify that natural-language edits produce valid updated sites.
 - [ ] **Oct 7:** Perform end-to-end verification of WhatsApp flow and Web form flow.
 - [ ] **Oct 8:** Final execution of `DEMO-CHECKLIST.md` with full team ahead of Oct 9 presentation.
 
@@ -181,4 +179,4 @@ Each Team Member: 2 Hours / Day
         └── 30 mins: Reconcile contract with teammate & commit to GitHub
 ```
 
-By following this daily action plan, every P0 requirement in the PRD and TRD will be fully implemented and verified for the October 9–10 demo.
+By following this daily action plan, every P0 requirement in PRD v2.0 and TRD v2.0 will be fully implemented and verified for the October 9–10 demo.
