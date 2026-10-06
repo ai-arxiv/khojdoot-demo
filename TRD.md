@@ -1,136 +1,181 @@
 # KhojDoot Technical Requirements Document (TRD)
 
-Version: TRD v1.0  
-Status: Working implementation document  
-Purpose: Hackathon implementation  
-Scope: Technical implementation, interfaces, responsibilities, integration, testing, and deployment  
+**Version:** TRD v2.0  
+**Status:** Hackathon implementation document  
+**Scope:** Technical implementation, ownership, integration, testing, deployment  
+**Problem Statement:** Regional-Language No-Code Website Creation Platform  
+**Relationship to previous TRD:** This document updates the existing TRD without discarding the work already assigned to the team.
 
-This TRD converts the PRD into an implementation plan.
+The main principle is simple: **the team keeps its existing technical roles. The new problem statement adds responsibilities inside those roles.** The purpose is to avoid restarting the project while bringing the implementation into alignment with the new website-generation requirements.
 
-The PRD defines what KhojDoot must do.
-
-The TRD defines how the team will build it and who owns each technical part.
+The previous TRD established the core responsibilities for FastAPI, persistence, AI processing, frontend, QA, AgentFacts, publishing, and integration. Those responsibilities remain the foundation.
 
 ---
 
 # 1. Technical objective
 
-The team must build one working end-to-end prototype:
+The final system must support this end-to-end flow:
+
+```text
+Regional-language user
+        ↓
+WhatsApp / Web Chat
+        ↓
+FastAPI
+        ↓
+KhojDoot Agent Harness
+        ↓
+Requirement Understanding
+        ↓
+InfoBin
+        ↓
+Validation
+        ↓
+User Approval
+        ↓
+WebsiteSpec
+        ↓
+Website Generation
+        ↓
+Website Validation
+        ↓
+Editable Website
+        ↓
+Publication
+        ↓
+AgentFacts + Crawlable Assets
+```
+
+The previous system ended primarily at:
 
 ```text
 Merchant
-   ↓
-WhatsApp / Web Chat
-   ↓
-FastAPI
-   ↓
-Agent Harness
-   ↓
-Input + AI Processing
-   ↓
+ ↓
 InfoBin
-   ↓
-Validation
-   ↓
-Merchant Approval
-   ↓
+ ↓
+Approval
+ ↓
 AgentFacts
-   ↓
-Crawlable Assets
-   ↓
+ ↓
 Khoj Card
 ```
 
-The system must work with:
+The new technical layer is:
 
-* Text.
-* Voice.
-* Images.
-* English.
-* Marathi.
-* Telugu.
+```text
+Approved InfoBin
+      ↓
+WebsiteSpec
+      ↓
+Component Directory
+      ↓
+Website Generation
+      ↓
+Website Validation
+      ↓
+Editing
+      ↓
+Revalidation
+```
 
-The core implementation must work before ordering features are added.
+This is the primary technical change caused by the new problem statement.
+
+The problem statement specifically requires natural-language requirement interpretation, code generation, editable website output, validation, decision support, multilingual usability, and measurable evidence.
 
 ---
 
-# 2. System architecture
+# 2. Technical architecture
 
 ```mermaid
 flowchart TB
 
-    subgraph CLIENTS["Interfaces"]
+    USER["Regional-language User"]
+
+    subgraph INTERFACE["Interfaces"]
         WA["Meta WhatsApp Cloud API"]
-        WEB["KhojDoot Web Chat"]
+        CHAT["KhojDoot Web Chat"]
+        PREVIEW["Website Preview"]
     end
 
-    subgraph APP["FastAPI Backend"]
+    subgraph BACKEND["FastAPI Backend"]
 
         API["FastAPI Application"]
 
-        subgraph HARNESS["Agent Harness"]
+        subgraph HARNESS["KhojDoot Agent Harness"]
             LOOP["Agent Control Loop"]
-            SKILL["Agent Skills<br/>SKILL.md"]
-            TOOLS["Agent Tools<br/>Python Functions"]
+            SKILLS["Agent Skills / SKILL.md"]
+            TOOLS["Python Tools"]
             STATE["Agent State"]
             MEMORY["Agent Memory"]
         end
 
         subgraph AI["AI Processing"]
-            SARVAM["Sarvam Saaras<br/>Speech to Text (mr-IN)"]
-            JEV["Jev<br/>Intent Classification"]
-            GEMINI["Gemini 3.6 Flash<br/>Information Extraction"]
+            STT["Sarvam Saaras (mr-IN)"]
+            INTENT["Intent / Requirement Understanding"]
+            EXTRACT["Information Extraction"]
+            IMAGE["Image Understanding"]
         end
 
-        subgraph CORE["Merchant Information"]
-            INFOBIN["InfoBin<br/>Pydantic Schema"]
+        subgraph DATA["Canonical Information"]
+            INFOBIN["InfoBin / Pydantic"]
             PROV["Provenance"]
-            VALID["Validation"]
-            APPROVAL["Merchant Approval"]
+            VALID["Business Validation"]
+            APPROVAL["User Approval"]
         end
 
-        subgraph PUBLISH["Publishing"]
-            FACTS["AgentFacts"]
-            JSON["Business JSON"]
-            JSONLD["JSON-LD"]
-            AGENTCARD["Agent Card"]
-            LLMS["llms.txt"]
-            LLMSFULL["llms-full.txt"]
-            SITEMAP["sitemap.xml"]
-            ROBOTS["robots.txt"]
-            SLUG["Dynamic Merchant Route"]
+        subgraph WEBSITE["Website Engine"]
+            COMPONENTS["Component Directory"]
+            DESIGN["Design Skills"]
+            WSPEC["WebsiteSpec"]
+            GENERATOR["Website Generator"]
+            WVALID["Website Validation"]
+            EDIT["Website Editing"]
         end
 
         subgraph STORAGE["Persistence"]
             DB["SQLite"]
         end
 
+        subgraph PUBLISH["Publishing"]
+            SITE["Dynamic Merchant Website"]
+            KHOJ["Khoj Card"]
+            FACTS["AgentFacts"]
+            JSON["Business JSON"]
+            JSONLD["JSON-LD"]
+            LLMS["llms.txt"]
+            FULL["llms-full.txt"]
+            SITEMAP["sitemap.xml"]
+            ROBOTS["robots.txt"]
+        end
+
         subgraph OBS["Observability"]
-            LOGS["FastAPI Logs"]
+            LOGS["Logs"]
+            METRICS["Validation / Generation Metrics"]
             LABS["KhojDoot Labs"]
         end
     end
 
+    USER --> WA
+    USER --> CHAT
+
     WA --> API
-    WEB --> API
+    CHAT --> API
 
     API --> LOOP
 
-    LOOP --> SKILL
+    LOOP --> SKILLS
     LOOP --> TOOLS
     LOOP --> STATE
     LOOP --> MEMORY
 
-    LOOP --> SARVAM
-    LOOP --> JEV
-    LOOP --> GEMINI
+    LOOP --> STT
+    LOOP --> INTENT
+    LOOP --> EXTRACT
+    LOOP --> IMAGE
 
-    SARVAM --> LOOP
-    JEV --> LOOP
-    GEMINI --> LOOP
-
-    LOOP --> INFOBIN
-    MEMORY --> INFOBIN
+    INTENT --> INFOBIN
+    EXTRACT --> INFOBIN
+    IMAGE --> INFOBIN
 
     INFOBIN --> PROV
     INFOBIN --> VALID
@@ -139,139 +184,116 @@ flowchart TB
     APPROVAL --> DB
     INFOBIN --> DB
 
+    APPROVAL --> WSPEC
+    WSPEC --> DESIGN
+    DESIGN --> COMPONENTS
+    COMPONENTS --> GENERATOR
+    GENERATOR --> WVALID
+    WVALID --> PREVIEW
+
+    PREVIEW --> EDIT
+    EDIT --> WSPEC
+
+    WVALID --> SITE
+
     APPROVAL --> FACTS
     APPROVAL --> JSON
     APPROVAL --> JSONLD
-    APPROVAL --> AGENTCARD
     APPROVAL --> LLMS
-    APPROVAL --> LLMSFULL
-    APPROVAL --> SITEMAP
-    APPROVAL --> ROBOTS
-    APPROVAL --> SLUG
+    APPROVAL --> FULL
+    SITE --> KHOJ
+    SITE --> SITEMAP
+    SITE --> ROBOTS
 
     API --> LOGS
     LOOP --> LOGS
-    STATE --> LOGS
-    LOGS --> LABS
+    WVALID --> METRICS
+    METRICS --> LABS
 ```
 
 ---
 
-# 3. Repository structure
+# 3. Existing role → new role mapping
 
-The target structure should be approximately:
+The team does **not** need a new organizational structure.
+
+| Person | Previous role | What stays the same | New responsibility |
+|---|---|---|---|
+| Ankur | System architect / integration | Architecture, contracts, integration, demo | Integrate website-generation architecture and keep new modules aligned |
+| Abhishek | FastAPI / backend | API, WhatsApp, Agent Harness integration, deployment | Add website-generation, WebsiteSpec, editing and validation API connections |
+| Shantanu | Database / InfoBin persistence | SQLite, InfoBin, provenance, CRUD | Persist WebsiteSpec, website versions, validation results and relevant metrics |
+| Paksha | AI processing / Agent Skills | Sarvam, Jev, Gemini, extraction, AI validation | Requirement understanding, website planning/generation AI integration, design/skill support |
+| Gayatri | Frontend / publishing interface | Web Chat, Khoj Card, dynamic route, publishing UI | Website preview, website editor, generated-site interface and WebsiteSpec-driven UI |
+| Sakshi | QA / technical validation | Test matrix, API tests, multilingual tests, E2E testing | Website generation validation, edit/revalidation testing and competition evidence |
+
+---
+
+# 4. Ankur — System Architect and Integration Owner
+
+## Existing responsibility — remains
+
+Ankur owns system-level integration.
+
+Existing responsibilities remain:
+
+- Maintain PRD and TRD.
+- Freeze technical contracts.
+- Define implementation order.
+- Review architecture changes.
+- Review interface-changing PRs.
+- Connect backend modules.
+- Connect frontend and backend.
+- Resolve cross-module conflicts.
+- Run end-to-end tests.
+- Maintain the demo path.
+- Maintain deployment configuration.
+- Ensure the happy path remains functional.
+
+## New responsibility
+
+Ankur additionally owns the integration of the new website-generation layer.
+
+Specifically:
 
 ```text
-khojdoot/
-│
-├── backend/
-│   ├── main.py
-│   │
-│   ├── routes/
-│   │   ├── whatsapp.py
-│   │   ├── merchants.py
-│   │   └── assets.py
-│   │
-│   ├── agent/
-│   │   ├── harness.py
-│   │   ├── state.py
-│   │   ├── memory.py
-│   │   ├── skills/
-│   │   │   └── onboarding/
-│   │   │       └── SKILL.md
-│   │   └── tools/
-│   │       └── merchant_tools.py
-│   │
-│   ├── ai/
-│   │   ├── sarvam.py
-│   │   ├── jev.py
-│   │   └── gemini.py
-│   │
-│   ├── infobin/
-│   │   ├── schema.py
-│   │   ├── service.py
-│   │   └── provenance.py
-│   │
-│   ├── agentfacts/
-│   │   ├── generator.py
-│   │   └── validator.py
-│   │
-│   ├── publishing/
-│   │   ├── json.py
-│   │   ├── jsonld.py
-│   │   ├── llms.py
-│   │   ├── sitemap.py
-│   │   └── robots.py
-│   │
-│   ├── database/
-│   │   ├── connection.py
-│   │   ├── merchants.py
-│   │   └── facts.py
-│   │
-│   └── tests/
-│
-├── frontend/
-│   ├── app/
-│   │   ├── merchant/
-│   │   │   └── [slug]/
-│   │   ├── chat/
-│   │   └── labs/
-│   │
-│   └── ...
-│
-├── docs/
-│   ├── PRD.md
-│   ├── TRD.md
-│   └── API.md
-│
-└── README.md
+InfoBin
+   ↓
+WebsiteSpec
+   ↓
+Website Generator
+   ↓
+Website Validation
+   ↓
+Frontend Preview
 ```
 
-This is the target organization.
+Ankur must:
 
-The team should not create every file immediately.
+1. Define the WebsiteSpec contract.
+2. Define the boundary between InfoBin and WebsiteSpec.
+3. Define the boundary between backend and frontend.
+4. Define the website-generation integration sequence.
+5. Ensure website generation does not break merchant onboarding.
+6. Ensure generated website information comes from approved InfoBin data.
+7. Integrate website validation into the main flow.
+8. Maintain the final end-to-end demo.
+9. Decide which P1/P2 features are cut if they threaten the core demo.
 
-Create files when their component starts.
+## Primary integration question
 
----
+Ankur should continuously ask:
 
-# 4. Technical ownership
+> “What is the next working connection?”
 
-## Ankur: System architect and integration owner
-
-Ankur owns the system-level integration.
-
-### Responsibilities
-
-* Maintain PRD and TRD.
-* Freeze technical contracts.
-* Define integration order.
-* Review architecture changes.
-* Review pull requests that affect interfaces.
-* Connect backend modules.
-* Connect frontend and backend.
-* Resolve cross-module conflicts.
-* Run end-to-end tests.
-* Maintain the demo path.
-* Maintain the final deployment configuration.
-* Verify that no component breaks the happy path.
-
-### Ankur should not own
-
-* Every backend endpoint.
-* Every AI integration.
-* Every database operation.
-* Every frontend component.
-
-The role is integration.
+rather than attempting to personally implement every module.
 
 ---
 
-# 5. Abhishek: FastAPI and backend owner
+# 5. Abhishek — FastAPI and Backend Owner
 
-Abhishek owns the backend application.
+## Existing responsibility — remains
 
-### Responsibilities
+Abhishek continues to own:
 
 ```text
 FastAPI
@@ -284,285 +306,562 @@ FastAPI
 └── Backend runtime
 ```
 
-### Required work
+Existing work remains:
 
-1. Create the FastAPI application.
-2. Create the basic health endpoint.
-3. Create the merchant API.
-4. Create the WhatsApp webhook.
-5. Connect the Agent Harness.
-6. Connect database services.
-7. Connect AI services.
-8. Return structured API responses.
-9. Handle backend errors.
-10. Prepare the backend for cloud deployment.
+- FastAPI application.
+- Health endpoint.
+- Merchant API.
+- WhatsApp webhook.
+- Agent Harness connection.
+- Database connection.
+- AI service connections.
+- Structured API responses.
+- Backend error handling.
+- Deployment.
 
-### First implementation
+## New responsibility
 
-```python
-from fastapi import FastAPI
+Abhishek adds the backend interface for website creation.
 
-app = FastAPI()
+Required backend capabilities:
 
-
-@app.get("/")
-def health():
-    return {
-        "status": "ok"
-    }
+```text
+Merchant
+ ↓
+Process requirement
+ ↓
+Create/update InfoBin
+ ↓
+Create WebsiteSpec
+ ↓
+Generate website
+ ↓
+Validate website
+ ↓
+Edit website
+ ↓
+Publish
 ```
 
-This is the first technical milestone.
+Conceptual endpoints:
+
+```text
+POST /merchants/{id}/process
+
+POST /merchants/{id}/website/generate
+
+GET  /merchants/{id}/website
+
+POST /merchants/{id}/website/edit
+
+POST /merchants/{id}/website/validate
+
+POST /merchants/{id}/publish
+```
+
+The exact endpoint names must be finalized in the API contract.
+
+## Backend integration boundary
+
+Abhishek does not own the website's visual design.
+
+He owns:
+
+```text
+Frontend request
+      ↓
+API
+      ↓
+Website service
+      ↓
+WebsiteSpec / generation
+      ↓
+Response
+```
 
 ---
 
-# 6. Shantanu: Database and InfoBin persistence owner
+# 6. Shantanu — Database and InfoBin Persistence Owner
 
-Shantanu owns persistence.
+## Existing responsibility — remains
 
-### Responsibilities
+Shantanu continues to own:
 
-* SQLite connection.
-* Database initialization.
-* Merchant records.
-* InfoBin persistence.
-* Provenance persistence.
-* Approval status.
-* Published asset status.
-* Database CRUD functions.
+- SQLite.
+- Database initialization.
+- Merchant records.
+- InfoBin persistence.
+- Provenance persistence.
+- Approval status.
+- Published state.
+- CRUD functions.
 
-### Important rule
+## New responsibility
 
-The database schema must be agreed before Abhishek and Shantanu independently modify it.
+The new website workflow requires persistence for:
 
-The current repository has conflicting database schemas.
+```text
+WebsiteSpec
+Website version
+Website status
+Validation result
+Generation status
+Edit history where required
+Basic generation metrics
+```
 
-Those conflicts must be resolved before integration.
+Conceptually:
+
+```text
+Merchant
+   │
+   ├── InfoBin
+   ├── Provenance
+   ├── Approval
+   ├── WebsiteSpec
+   ├── WebsiteVersion
+   ├── ValidationResult
+   └── PublicationStatus
+```
+
+## Important rule
+
+InfoBin remains the source of business truth.
+
+WebsiteSpec must not become a second business-information database.
+
+For example:
+
+```text
+Business phone number
+        ↓
+InfoBin
+
+WebsiteSpec
+        ↓
+references / presents phone number
+```
+
+not two independent phone-number records.
+
+## Schema coordination
+
+The existing rule remains:
+
+> The database schema must be agreed before Abhishek and Shantanu independently modify it.
+
+This becomes even more important because WebsiteSpec and validation data are now being added.
 
 ---
 
-# 7. Paksha: AI processing and agent-processing owner
+# 7. Paksha — AI Processing and Agent Skills Owner
 
-Paksha owns the AI processing components.
+## Existing responsibility — remains
 
-### Responsibilities
+Paksha continues to own:
+
+```text
+Sarvam (Saaras mr-IN)
+Jev
+Gemini 3.6 Flash
+Extraction
+AI validation
+Agent Skills
+Agent-processing integration
+```
+
+## Existing AI flow
 
 ```text
 Voice
-  ↓
+ ↓
 Sarvam (Saaras mr-IN)
 
-Input
-  ↓
-Jev
+User input
+ ↓
+Jev / requirement understanding
 
 Text / Images
-  ↓
+ ↓
 Gemini 3.6 Flash
 
 All
-  ↓
+ ↓
 Structured information
+ ↓
+InfoBin
 ```
 
-### Specific ownership
+## New responsibility
 
-* Sarvam integration (`saaras:v1`).
-* Jev integration.
-* Gemini 3.6 Flash integration.
-* Extraction prompt.
-* Extraction response format.
-* AI error handling.
-* AI response validation before InfoBin.
-* Integration with Agent Harness.
+The AI layer now also needs to understand website requirements.
 
-### Important rule
+For example:
 
-Paksha does not define the database schema independently.
+```text
+"माझ्या दुकानासाठी साधी website बनवा.
+Menu मोठा दाखवा आणि WhatsApp button ठेवा."
+```
 
-The AI output must conform to the agreed InfoBin schema.
+must become structured requirements.
+
+Conceptually:
+
+```text
+Regional-language input
+        ↓
+Requirement understanding
+        ↓
+Business information
+        +
+Website requirements
+        ↓
+InfoBin + WebsiteSpec inputs
+```
+
+Paksha's new technical responsibilities include:
+
+1. Requirement extraction.
+2. Website requirement classification.
+3. Structured website requirement output.
+4. Website content generation where required.
+5. Website planning assistance.
+6. AI-assisted design/skill integration.
+7. AI response validation.
+8. Integration with the Agent Harness.
+
+## Agent Skills
+
+The existing `SKILL.md` architecture remains.
+
+New skills can include:
+
+```text
+skills/
+├── onboarding/
+├── requirement-understanding/
+├── website-planning/
+├── frontend-design/
+├── website-generation/
+├── website-editing/
+└── website-validation/
+```
+
+The exact skill set should be kept small enough for the hackathon.
+
+The important requirement is that skills produce structured, controlled outputs.
 
 ---
 
-# 8. Gayatri: Frontend and publishing-interface owner
+# 8. Gayatri — Frontend and Website Interface Owner
 
-Gayatri owns the user-facing web application.
+This role changes the most visibly because the new problem statement requires an editable website.
 
-### Responsibilities
+## Existing responsibility — remains
 
-* KhojDoot Web Chat.
-* Khoj Card.
-* Dynamic merchant route.
-* Business JSON display/access.
-* JSON-LD integration.
-* KhojDoot Labs interface.
-* Frontend API integration.
+Gayatri continues to own:
 
-### Dynamic route
+- Web Chat.
+- Khoj Card.
+- Dynamic merchant route.
+- Business JSON display.
+- JSON-LD integration.
+- KhojDoot Labs interface.
+- Frontend API integration.
 
-The route should use one reusable page:
+The dynamic merchant route remains:
 
 ```text
 /merchant/[slug]
 ```
 
-The slug identifies the merchant.
+## New responsibility
 
-No separate deployment is required for each merchant.
+Gayatri additionally owns the user-facing website creation interface.
 
----
-
-# 9. Sakshi: QA and technical validation owner
-
-Sakshi owns testing.
-
-This is a technical responsibility.
-
-### Responsibilities
-
-* Test matrix.
-* Test inputs.
-* Multilingual tests.
-* Voice tests.
-* Image tests.
-* API tests.
-* Agent state tests.
-* InfoBin validation tests.
-* Merchant approval tests.
-* AgentFacts validation tests.
-* Crawlable asset tests.
-* End-to-end tests.
-* Demo checklist.
-
-### Test matrix
+This includes:
 
 ```text
-                English  Marathi  Telugu
-Text               ✓        ✓        ✓
-Voice              ✓        ✓        ✓
-Image              ✓        ✓        ✓
+Website Preview
+Website Editor
+Generated Website UI
+Website version display
+Edit controls
+Validation-result presentation
 ```
 
-The exact supported combinations should be tested against actual provider behavior.
+The frontend should consume the backend's WebsiteSpec and generated output.
 
----
-
-# 10. AgentFacts ownership
-
-AgentFacts must have an explicit technical owner.
-
-The implementation owner must use the AgentFacts repository provided by the team.
-
-Responsibilities:
-
-* Clone/use the selected repository.
-* Understand the actual schema.
-* Implement the generator.
-* Implement validation.
-* Map approved InfoBin fields to the AgentFacts structure.
-* Generate the required artifact.
-* Test the artifact.
-* Integrate it with publishing.
-
-No AgentFacts field should be invented.
-
----
-
-# 11. Component ownership matrix
-
-| Component           | Primary owner                 | Supporting owner |
-| ------------------- | ----------------------------- | ---------------- |
-| FastAPI             | Abhishek                      | Ankur            |
-| WhatsApp webhook    | Abhishek                      | Ankur            |
-| Agent Harness       | Abhishek / Paksha             | Ankur            |
-| Agent Skills        | Paksha                        | Ankur            |
-| Agent Tools         | Abhishek                      | Shantanu         |
-| Agent State         | Abhishek                      | Ankur            |
-| Agent Memory        | Shantanu                      | Abhishek         |
-| Sarvam              | Paksha                        | Abhishek         |
-| Jev                 | Paksha                        | Abhishek         |
-| Gemini              | Paksha                        | Abhishek         |
-| InfoBin schema      | Shantanu + Paksha             | Ankur            |
-| InfoBin persistence | Shantanu                      | Abhishek         |
-| Provenance          | Shantanu                      | Paksha           |
-| Validation          | Paksha + Shantanu             | Sakshi           |
-| Merchant approval   | Abhishek                      | Sakshi           |
-| AgentFacts          | Assigned implementation owner | Ankur            |
-| Business JSON       | Gayatri                       | Abhishek         |
-| JSON-LD             | Gayatri                       | Ankur            |
-| Agent Card          | Gayatri / backend integration | Ankur            |
-| `llms.txt`          | Gayatri                       | Abhishek         |
-| `llms-full.txt`     | Gayatri                       | Abhishek         |
-| `sitemap.xml`       | Gayatri                       | Abhishek         |
-| `robots.txt`        | Gayatri                       | Abhishek         |
-| Dynamic route       | Gayatri                       | Abhishek         |
-| Khoj Card           | Gayatri                       | Abhishek         |
-| KhojDoot Labs       | Gayatri                       | Ankur            |
-| Logs                | Abhishek                      | Ankur            |
-| QA                  | Sakshi                        | Everyone         |
-| Deployment          | Abhishek                      | Ankur            |
-| Integration         | Ankur                         | Everyone         |
-| Final demo          | Ankur                         | Everyone         |
-
----
-
-# 12. API contracts
-
-The team must agree on API contracts before integration.
-
-The exact endpoint names can be finalized in `API.md`.
-
-The minimum backend contract should cover:
+Conceptually:
 
 ```text
-Health
-Merchant
-Onboarding
-WhatsApp
-Facts
-Approval
-Publishing
+Backend
+  ↓
+WebsiteSpec
+  ↓
+Frontend renderer / generated website
+  ↓
+Preview
 ```
 
-Example conceptual API:
+## Website editor
+
+The primary editing interface can be conversational:
 
 ```text
-GET  /health
+User:
+"Remove testimonials."
 
-POST /merchants
-
-GET  /merchants/{id}
-
-POST /merchants/{id}/process
-
-POST /merchants/{id}/approve
-
-GET  /merchants/{slug}
-
-GET  /merchants/{slug}/facts
-
-GET  /merchants/{slug}/agentfacts
-
-GET  /sitemap.xml
-
-GET  /llms.txt
-
-GET  /llms-full.txt
-
-GET  /robots.txt
-
-GET  /.well-known/agent-card.json
+Frontend
+ ↓
+Backend
+ ↓
+Agent
+ ↓
+WebsiteSpec update
+ ↓
+Updated preview
 ```
 
-These are proposed interface names for the TRD.
+A secondary visual interface may expose:
 
-They must not be implemented blindly if the existing repository already uses different contracts.
+```text
+Sections
+Components
+Order
+Theme
+Content
+```
+
+if time permits.
+
+## Component Directory
+
+The technical website components should be defined as reusable components:
+
+```text
+Hero
+About
+Services
+Products
+Gallery
+Testimonials
+Pricing
+FAQ
+Location
+Contact
+Footer
+```
+
+Gayatri should integrate these into the frontend system rather than create an entirely separate website implementation for every merchant.
+
+## Design skills / SKILL.md
+
+The website-generation design process should use the agreed skill structure and WebsiteSpec.
+
+The implementation boundary is:
+
+```text
+Design Skill
+      ↓
+WebsiteSpec
+      ↓
+Frontend implementation
+```
+
+rather than manually designing every generated website from zero.
 
 ---
 
-# 13. Internal data contract
+# 9. Sakshi — QA and Technical Validation Owner
 
-The central internal contract is:
+## Existing responsibility — remains
+
+Sakshi continues to own:
+
+- Test matrix.
+- Test inputs.
+- Multilingual tests.
+- Voice tests.
+- Image tests.
+- API tests.
+- Agent-state tests.
+- InfoBin validation tests.
+- Merchant approval tests.
+- AgentFacts tests.
+- Crawlable asset tests.
+- End-to-end tests.
+- Demo checklist.
+
+## New responsibility
+
+Sakshi now adds the website-generation validation layer.
+
+Tests must include:
+
+```text
+Requirement
+ ↓
+WebsiteSpec
+ ↓
+Website
+ ↓
+Validation
+ ↓
+Edit
+ ↓
+Revalidation
+```
+
+Specific tests:
+
+### Website generation
+
+- WebsiteSpec is valid.
+- Required sections exist.
+- Known components are used.
+- Website renders.
+- Business information appears correctly.
+
+### Multilingual generation
+
+```text
+English
+Marathi
+Telugu
+```
+
+should be tested according to the actual supported configuration.
+
+### Editing
+
+Test:
+
+```text
+Add section
+Remove section
+Update content
+Reorder section
+Change style
+```
+
+### Validation
+
+Test:
+
+```text
+Valid website → PASS
+
+Missing required field → FAIL
+
+Broken output → FAIL
+
+Corrected output → PASS
+```
+
+### Competition evidence
+
+Sakshi should maintain a clear validation record showing measurable results.
+
+Example:
+
+```text
+Website generation: PASS
+Required sections: 6/6
+Business information: PASS
+Mobile rendering: PASS
+Links: PASS
+Language: PASS
+Overall: 6/6
+```
+
+---
+
+# 10. AgentFacts and publishing ownership
+
+The existing AgentFacts responsibilities remain.
+
+The implementation owner must:
+
+- Use the selected AgentFacts repository/schema.
+- Understand the actual schema.
+- Implement the generator.
+- Validate the artifact.
+- Map approved InfoBin fields.
+- Generate the artifact.
+- Test it.
+- Integrate it into publication.
+
+The existing TRD explicitly says AgentFacts fields must not be invented.
+
+The new website flow does not replace this.
+
+It becomes:
+
+```text
+Approved InfoBin
+      │
+      ├── Website
+      ├── AgentFacts
+      ├── Business JSON
+      ├── JSON-LD
+      ├── llms.txt
+      └── Other crawlable assets
+```
+
+---
+
+# 11. Updated component ownership matrix
+
+| Component | Primary owner | Supporting owner |
+|---|---|---|
+| FastAPI | Abhishek | Ankur |
+| WhatsApp webhook | Abhishek | Ankur |
+| Agent Harness | Abhishek / Paksha | Ankur |
+| Agent Skills | Paksha | Ankur |
+| Agent Tools | Abhishek | Shantanu |
+| Agent State | Abhishek | Ankur |
+| Agent Memory | Shantanu | Abhishek |
+| Sarvam | Paksha | Abhishek |
+| Jev | Paksha | Abhishek |
+| Gemini | Paksha | Abhishek |
+| Requirement understanding | Paksha | Ankur |
+| InfoBin schema | Shantanu + Paksha | Ankur |
+| InfoBin persistence | Shantanu | Abhishek |
+| Provenance | Shantanu | Paksha |
+| Business validation | Paksha + Shantanu | Sakshi |
+| Merchant approval | Abhishek | Sakshi |
+| WebsiteSpec | Ankur + Paksha | Gayatri |
+| Component Directory | Gayatri | Ankur |
+| Design Skills | Paksha | Gayatri |
+| Website generation integration | Abhishek | Ankur / Gayatri |
+| Website validation | Sakshi | Paksha + Abhishek |
+| Website editing | Gayatri | Abhishek / Ankur |
+| Website preview | Gayatri | Abhishek |
+| Dynamic website route | Gayatri | Abhishek |
+| Business JSON | Gayatri | Abhishek |
+| JSON-LD | Gayatri | Abhishek |
+| Agent Card | Gayatri / backend integration | Ankur |
+| `llms.txt` | Gayatri | Abhishek |
+| `llms-full.txt` | Gayatri | Abhishek |
+| `sitemap.xml` | Gayatri | Abhishek |
+| `robots.txt` | Gayatri | Abhishek |
+| AgentFacts | Assigned implementation owner | Ankur |
+| Khoj Card | Gayatri | Abhishek |
+| KhojDoot Labs | Gayatri | Ankur |
+| Generation metrics | Shantanu | Sakshi |
+| Validation metrics | Sakshi | Shantanu |
+| Logs | Abhishek | Ankur |
+| QA | Sakshi | Everyone |
+| Deployment | Abhishek | Ankur |
+| Integration | Ankur | Everyone |
+| Final demo | Ankur | Everyone |
+
+---
+
+# 12. New technical contracts
+
+The existing internal contract was:
 
 ```text
 Raw Input
@@ -580,505 +879,692 @@ Approved InfoBin
 Published Assets
 ```
 
-The important states are:
+It is now extended to:
 
 ```text
-DRAFT
-PROCESSING
-VALIDATED
-PENDING_APPROVAL
-APPROVED
-PUBLISHED
-```
-
-The final state model should be implemented consistently across the backend.
-
----
-
-# 14. Agent execution contract
-
-The Agent Harness should conceptually execute:
-
-```text
-Receive input
-     ↓
-Load state
-     ↓
-Load relevant memory
-     ↓
-Load Skill
-     ↓
-Determine intent
-     ↓
-Select tool if required
-     ↓
-Call model/tool
-     ↓
-Update state
-     ↓
-Update InfoBin
-     ↓
-Validate
-     ↓
-Ask for approval if required
-```
-
-The control loop should remain under application control.
-
-The model should not directly control database access.
-
----
-
-# 15. Agent tool contract
-
-Tools should be controlled Python functions.
-
-Conceptually:
-
-```python
-create_merchant(...)
-get_merchant(...)
-update_merchant(...)
-update_infobin(...)
-validate_infobin(...)
-request_approval(...)
-publish_merchant(...)
-generate_agentfacts(...)
-```
-
-These are conceptual functions.
-
-The final signatures should be defined in code after the InfoBin schema is frozen.
-
----
-
-# 16. Agent memory contract
-
-Memory has two levels.
-
-### Short-term
-
-Current interaction state.
-
-```text
-Current message
-Current question
-Current onboarding step
-Pending confirmation
-```
-
-### Persistent
-
-Merchant business information.
-
-```text
-Merchant
+Raw Input
+    ↓
+Processed Input
+    ↓
+Extracted Facts
+    ↓
 InfoBin
-Provenance
-Approval
-Published state
-```
-
-The two must not be mixed.
-
----
-
-# 17. AgentFacts publishing contract
-
-The publishing pipeline is:
-
-```text
+    ↓
+Validated InfoBin
+    ↓
 Approved InfoBin
-      ↓
-AgentFacts Generator
-      ↓
-AgentFacts Validation
-      ↓
-AgentFacts Artifact
-      ↓
-Public publication
+    │
+    ├───────────────┐
+    ↓               ↓
+WebsiteSpec      Publishing
+    ↓               ↓
+Website         AgentFacts
+    ↓           Business JSON
+Validation       JSON-LD
+    ↓            llms.txt
+Edit              etc.
+    ↓
+Revalidation
+    ↓
+Published Website
 ```
-
-If AgentFacts generation fails:
-
-```text
-Do not publish invalid AgentFacts.
-```
-
-The failure should be logged.
-
-The merchant's approved information must not be silently changed to make the AgentFacts artifact pass validation.
 
 ---
 
-# 18. Crawlable asset contract
+# 13. WebsiteSpec contract
 
-The publication system generates:
-
-```text
-Business JSON
-JSON-LD
-AgentFacts
-Agent Card
-llms.txt
-llms-full.txt
-sitemap.xml
-robots.txt
-```
-
-The assets must use the same approved source.
-
-Therefore:
-
-```text
-Approved InfoBin
-       │
-       ├── Business JSON
-       ├── JSON-LD
-       ├── AgentFacts
-       ├── llms.txt
-       └── llms-full.txt
-```
-
-This avoids different versions of the merchant information appearing in different files.
-
----
-
-# 19. Deployment architecture
-
-## Development
-
-```text
-Developer computer
-      ↓
-Python
-      ↓
-Uvicorn
-      ↓
-FastAPI
-```
-
-## WhatsApp development
-
-A public HTTPS endpoint is required.
+WebsiteSpec is the most important new internal contract.
 
 Conceptually:
 
-```text
-Meta
- ↓
-Public HTTPS endpoint
- ↓
-FastAPI
+```json
+{
+  "merchant_id": "example",
+  "language": "mr-IN",
+  "theme": {
+    "style": "minimal"
+  },
+  "sections": [
+    {
+      "id": "hero",
+      "type": "hero"
+    },
+    {
+      "id": "products",
+      "type": "products"
+    },
+    {
+      "id": "location",
+      "type": "location"
+    },
+    {
+      "id": "contact",
+      "type": "contact"
+    }
+  ]
+}
 ```
 
-A tunnel can be used during local testing.
+The exact schema must be frozen before frontend and backend integration.
 
-The previous sandbox failure must not be repeated.
-
-The long-running server must run in a stable environment.
-
-## Final prototype
+Ownership:
 
 ```text
-Internet
-   │
-   ├── Vercel
-   │     └── Next.js
-   │
-   └── Cloud backend
-         └── FastAPI
+Ankur
+ ↓
+defines contract
+
+Paksha
+ ↓
+AI generation / planning
+
+Gayatri
+ ↓
+frontend consumption
+
+Abhishek
+ ↓
+API integration
+
+Shantanu
+ ↓
+persistence
+
+Sakshi
+ ↓
+validation
 ```
-
-Railway can be used as the cloud backend deployment service if selected.
-
-The exact hosting provider is a deployment decision.
 
 ---
 
-# 20. Git workflow
+# 14. Website generation contract
 
-Use one repository.
+```text
+WebsiteSpec
+     ↓
+Component validation
+     ↓
+Component selection
+     ↓
+Generation
+     ↓
+Build
+     ↓
+Render
+     ↓
+Validation
+```
 
-Use feature branches.
+A generated website is not considered complete merely because code was generated.
+
+It must:
+
+```text
+Build
+Render
+Pass required validation
+```
+
+---
+
+# 15. Website editing contract
+
+Editing follows:
+
+```text
+User request
+      ↓
+Agent interprets request
+      ↓
+Structured edit
+      ↓
+WebsiteSpec update
+      ↓
+Website regeneration/update
+      ↓
+Validation
+      ↓
+Preview
+```
+
+Examples:
+
+```text
+"Remove testimonials."
+"Add a gallery."
+"Move menu above about."
+"Make the website more traditional."
+"Add WhatsApp contact."
+```
+
+The system should modify WebsiteSpec rather than directly asking an LLM to rewrite arbitrary frontend code.
+
+---
+
+# 16. Website validation contract
+
+Validation should return structured output.
 
 Example:
 
+```json
+{
+  "status": "passed",
+  "score": 8,
+  "checks": [
+    {
+      "name": "required_sections",
+      "status": "passed"
+    },
+    {
+      "name": "business_information",
+      "status": "passed"
+    },
+    {
+      "name": "links",
+      "status": "passed"
+    }
+  ]
+}
+```
+
+This allows the frontend to display evidence without implementing its own validation logic.
+
+---
+
+# 17. Updated API contract
+
+The previous API contract remains valid for the existing system. The new website layer adds:
+
 ```text
-main
+POST /merchants/{id}/website/generate
+
+GET  /merchants/{id}/website
+
+GET  /merchants/{id}/website/spec
+
+POST /merchants/{id}/website/edit
+
+POST /merchants/{id}/website/validate
+
+GET  /merchants/{id}/website/validation
+
+POST /merchants/{id}/publish
+```
+
+The exact final endpoints belong in `API.md`.
+
+---
+
+# 18. Updated repository structure
+
+```text
+khojdoot/
 │
-├── feature/fastapi
-├── feature/infobin
-├── feature/ai-processing
-├── feature/agentfacts
-├── feature/frontend
-└── feature/qa
+├── backend/
+│   ├── main.py
+│   │
+│   ├── routes/
+│   │   ├── whatsapp.py
+│   │   ├── merchants.py
+│   │   ├── website.py
+│   │   └── assets.py
+│   │
+│   ├── agent/
+│   │   ├── harness.py
+│   │   ├── state.py
+│   │   ├── memory.py
+│   │   ├── skills/
+│   │   │   ├── onboarding/
+│   │   │   ├── requirement-understanding/
+│   │   │   ├── website-planning/
+│   │   │   ├── website-generation/
+│   │   │   └── website-editing/
+│   │   └── tools/
+│   │       └── merchant_tools.py
+│   │
+│   ├── ai/
+│   │   ├── sarvam.py
+│   │   ├── jev.py
+│   │   └── gemini.py
+│   │
+│   ├── infobin/
+│   │   ├── schema.py
+│   │   ├── service.py
+│   │   └── provenance.py
+│   │
+│   ├── website/
+│   │   ├── schema.py
+│   │   ├── planner.py
+│   │   ├── generator.py
+│   │   ├── validator.py
+│   │   └── editor.py
+│   │
+│   ├── components/
+│   │   ├── hero/
+│   │   ├── products/
+│   │   ├── services/
+│   │   ├── gallery/
+│   │   ├── about/
+│   │   ├── contact/
+│   │   └── footer/
+│   │
+│   ├── agentfacts/
+│   │   ├── generator.py
+│   │   └── validator.py
+│   │
+│   ├── publishing/
+│   │   ├── json.py
+│   │   ├── jsonld.py
+│   │   ├── llms.py
+│   │   ├── sitemap.py
+│   │   └── robots.py
+│   │
+│   ├── database/
+│   │   ├── connection.py
+│   │   ├── merchants.py
+│   │   ├── website.py
+│   │   └── facts.py
+│   │
+│   └── tests/
+│
+├── frontend/
+│   ├── app/
+│   │   ├── merchant/
+│   │   │   └── [slug]/
+│   │   ├── chat/
+│   │   ├── editor/
+│   │   └── labs/
+│   │
+│   └── components/
+│
+├── docs/
+│   ├── PRD.md
+│   ├── TRD.md
+│   └── API.md
+│
+└── README.md
 ```
 
-Rules:
-
-1. `main` must remain runnable.
-2. Do not directly modify another person's module without coordination.
-3. Open a pull request for integration.
-4. Do not merge conflicting database schemas.
-5. Test before merge.
-6. Keep commits focused.
-7. Do not introduce unrelated features during the hackathon.
+This extends the previous repository structure rather than replacing it.
 
 ---
 
-# 21. Definition of done for each component
+# 19. Integration order
 
-A component is not complete when the code exists.
-
-It is complete when it has:
+The updated order is:
 
 ```text
-Code
-+
-Interface contract
-+
-Example input
-+
-Example output
-+
-Basic test
-+
-README / usage instruction
+1. FastAPI
+      ↓
+2. SQLite
+      ↓
+3. InfoBin
+      ↓
+4. Merchant state
+      ↓
+5. Agent Harness
+      ↓
+6. Agent Skills
+      ↓
+7. AI processing
+      ↓
+8. Validation
+      ↓
+9. Merchant approval
+      ↓
+10. WebsiteSpec
+      ↓
+11. Component Directory
+      ↓
+12. Website generation
+      ↓
+13. Website validation
+      ↓
+14. Preview
+      ↓
+15. Website editing
+      ↓
+16. Revalidation
+      ↓
+17. Dynamic website
+      ↓
+18. AgentFacts
+      ↓
+19. Crawlable assets
+      ↓
+20. Khoj Card
+      ↓
+21. WhatsApp
+      ↓
+22. Deployment
+      ↓
+23. End-to-end demo
 ```
-
-For example, Sarvam integration is complete when:
-
-```text
-Audio input
-   ↓
-Sarvam
-   ↓
-Text
-```
-
-works through the actual code path and has a test.
 
 ---
 
-# 22. Integration checkpoints
+# 20. Team integration checkpoints
 
-Do not wait until the end.
-
-Use these checkpoints.
-
-### Checkpoint 1
+## Checkpoint 1 — Backend
 
 ```text
 FastAPI
-   ↓
+ ↓
 Health endpoint
 ```
 
-### Checkpoint 2
+Owner: Abhishek.
+
+## Checkpoint 2 — Persistence
 
 ```text
 FastAPI
-   ↓
+ ↓
 SQLite
-   ↓
+ ↓
 Merchant
 ```
 
-### Checkpoint 3
+Owners: Abhishek + Shantanu.
+
+## Checkpoint 3 — AI
 
 ```text
 Input
-   ↓
+ ↓
 AI
-   ↓
+ ↓
 InfoBin
 ```
 
-### Checkpoint 4
+Owners: Paksha + Abhishek + Shantanu.
+
+## Checkpoint 4 — Validation
 
 ```text
 InfoBin
-   ↓
+ ↓
 Validation
-   ↓
+ ↓
 Approval
 ```
 
-### Checkpoint 5
+Owners: Paksha + Shantanu + Sakshi.
+
+## Checkpoint 5 — Website specification
 
 ```text
 Approved InfoBin
-   ↓
-AgentFacts
-   ↓
-Crawlable assets
+ ↓
+WebsiteSpec
 ```
 
-### Checkpoint 6
+Owners: Ankur + Paksha.
+
+## Checkpoint 6 — Website
 
 ```text
-Khoj Card
-   ↓
-Published merchant
+WebsiteSpec
+ ↓
+Components
+ ↓
+Generated website
 ```
 
-### Checkpoint 7
+Owners: Gayatri + Abhishek.
+
+## Checkpoint 7 — Website validation
 
 ```text
-WhatsApp
-   ↓
-Complete backend
-   ↓
-Khoj Card
-```
-
-### Checkpoint 8
-
-```text
-Public deployment
-   ↓
-End-to-end demo
-```
-
----
-
-# 23. First coding task
-
-The team should not begin by implementing every module.
-
-The first technical task is:
-
-```text
-backend/main.py
-```
-
-Start with:
-
-```python
-from fastapi import FastAPI
-
-app = FastAPI()
-
-
-@app.get("/")
-def health():
-    return {
-        "status": "ok"
-    }
-```
-
-Run:
-
-```bash
-python -m uvicorn main:app --reload
-```
-
-Verify:
-
-```text
-http://127.0.0.1:8000
-```
-
-Then:
-
-```text
-GET /docs
-```
-
-This establishes the first working backend.
-
-After this, add SQLite.
-
-Then InfoBin.
-
-Then the agent loop.
-
-Then AI.
-
-Then publishing.
-
-Then WhatsApp.
-
-Then deployment.
-
----
-
-# 24. Technical priority
-
-The priority order is:
-
-```text
-P0
-FastAPI
-InfoBin
-Agent Harness
-AI processing
+Website
+ ↓
 Validation
-Approval
+ ↓
+Evidence
+```
+
+Owners: Sakshi + Abhishek.
+
+## Checkpoint 8 — Editing
+
+```text
+User edit
+ ↓
+WebsiteSpec
+ ↓
+Updated website
+ ↓
+Validation
+```
+
+Owners: Gayatri + Ankur + Abhishek.
+
+## Checkpoint 9 — Publication
+
+```text
+Approved data
+ ↓
+Website
+ ↓
 AgentFacts
+ ↓
 Crawlable assets
-Khoj Card
-WhatsApp
-Deployment
 ```
+
+Owners: Gayatri + assigned AgentFacts owner + Abhishek.
+
+## Checkpoint 10 — Complete demo
 
 ```text
-P1
-KhojDoot Labs
-Advanced observability
+Regional language
+ ↓
+Website
+ ↓
+Edit
+ ↓
+Validation
+ ↓
+Publication
 ```
 
-```text
-P2
-Ordering
-MCP
-A2A
-Payment
-```
-
-P2 must not block P0.
+Owner: Ankur, with the entire team.
 
 ---
 
-# 25. Final engineering rule
+# 21. Updated testing matrix
 
-The team must always ask:
+| Input | English | Marathi | Telugu |
+|---|---:|---:|---:|
+| Text | ✓ | ✓ | ✓ |
+| Voice | ✓ | ✓ | ✓ |
+| Image | ✓ | ✓ | ✓ |
 
-> What is the next working connection?
+Website validation matrix:
 
-Not:
+| Capability | Test |
+|---|---|
+| Requirement extraction | Requirement becomes structured data |
+| InfoBin | Correct business fields |
+| WebsiteSpec | Valid structure |
+| Website generation | Website renders |
+| Website validation | Correct PASS/FAIL |
+| Editing | Requested change is applied |
+| Revalidation | Modified site is checked again |
+| Publication | Public route works |
+| AgentFacts | Valid artifact |
+| Crawlable assets | Files resolve |
+| Mobile layout | Usable mobile page |
+| Multilingual content | Selected language is preserved |
 
-> How do we build the entire KhojDoot system?
+---
 
-The implementation sequence is:
+# 22. Definition of done
+
+The new competition-critical definition of done is:
 
 ```text
-Python
+User
  ↓
+Regional-language requirement
+ ↓
+Requirement understood
+ ↓
+InfoBin created
+ ↓
+InfoBin validated
+ ↓
+User approval
+ ↓
+WebsiteSpec created
+ ↓
+Website generated
+ ↓
+Website validated
+ ↓
+Website preview shown
+ ↓
+User edits website
+ ↓
+Website updated
+ ↓
+Website revalidated
+ ↓
+Website published
+```
+
+---
+
+# 23. What the team should not change
+
+The following existing architecture should remain stable:
+
+```text
 FastAPI
- ↓
 SQLite
- ↓
 InfoBin
- ↓
+Pydantic
 Agent Harness
- ↓
-AI
- ↓
-Validation
- ↓
-Approval
- ↓
+SKILL.md
+Python tools
+Sarvam (Saaras mr-IN)
+Jev
+Gemini 3.6 Flash
 AgentFacts
- ↓
-Crawlable Assets
- ↓
+Dynamic merchant route
 Khoj Card
- ↓
-WhatsApp
- ↓
-Public Deployment
+WhatsApp integration
 ```
 
-That sequence is the technical execution plan for the hackathon.
+The new problem statement does **not** require replacing these components. It requires adding the missing website-generation workflow around them.
+
+---
+
+# 24. What is newly required
+
+The team should specifically recognize these as the new technical requirements:
+
+```text
+Website requirements extraction
+        ↓
+WebsiteSpec
+        ↓
+Component Directory
+        ↓
+Design Skills
+        ↓
+Website generation
+        ↓
+Website validation
+        ↓
+Website preview
+        ↓
+Website editing
+        ↓
+Revalidation
+        ↓
+Generation / validation metrics
+```
+
+---
+
+# 25. Final responsibility model
+
+The updated project can be understood as six connected ownership areas:
+
+```text
+                 KHOJDOOT
+                     │
+     ┌───────────────┼────────────────┐
+     │               │                │
+     ▼               ▼                ▼
+  BACKEND          AI/DATA         WEBSITE
+ Abhishek       Paksha/Shantanu     Gayatri
+     │               │                │
+     └───────────────┼────────────────┘
+                     │
+                     ▼
+                  TESTING
+                   Sakshi
+                     │
+                     ▼
+                INTEGRATION
+                   Ankur
+```
+
+More precisely:
+
+```text
+Ankur
+System + Integration
+        │
+        ├── Architecture
+        ├── Contracts
+        ├── WebsiteSpec boundary
+        └── End-to-end demo
+
+Abhishek
+Backend
+        │
+        ├── FastAPI
+        ├── WhatsApp
+        ├── APIs
+        ├── Agent integration
+        └── Website backend services
+
+Shantanu
+Persistence
+        │
+        ├── SQLite
+        ├── InfoBin
+        ├── Provenance
+        ├── WebsiteSpec persistence
+        └── Metrics persistence
+
+Paksha
+AI + Skills
+        │
+        ├── Sarvam (Saaras mr-IN)
+        ├── Jev
+        ├── Gemini 3.6 Flash
+        ├── Requirement understanding
+        └── Website planning / skills
+
+Gayatri
+Frontend + Website
+        │
+        ├── Web Chat
+        ├── Website preview
+        ├── Website editor
+        ├── Components
+        ├── Khoj Card
+        └── Publishing interface
+
+Sakshi
+QA + Validation
+        │
+        ├── Existing QA
+        ├── Website validation
+        ├── Edit/revalidation tests
+        └── Demo evidence
+```
