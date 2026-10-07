@@ -1,6 +1,23 @@
 from fastapi import FastAPI
 from app.db.connection import init_db
-from app.db.crud import get_shop, create_shop, update_shop, save_infobin, get_infobin, get_facts, update_status, get_status, save_provenance, get_provenance, save_photo, get_photos
+from app.db.crud import (
+    get_shop,
+    create_shop,
+    update_shop,
+    save_infobin,
+    get_infobin,
+    get_facts,
+    update_status,
+    get_status,
+    save_provenance,
+    get_provenance,
+    save_photo,
+    get_photos,
+    save_consent,
+    get_consent,
+    save_website_spec,
+    get_website_specs
+)
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -27,14 +44,28 @@ class Status(BaseModel):
 
 
 class Provenance(BaseModel):
-    source: str
-    channel: str
-    extraction: str
-    approval: str
+    field_name: str
+    source_type: str
+    confidence: float
+    confirmed: bool
 
 
 class Photo(BaseModel):
     filename: str
+    source: str | None = None
+
+
+class Consent(BaseModel):
+    consent_type: str
+    approved_at: str
+    payload_hash: str
+
+
+class WebsiteSpec(BaseModel):
+    version: int
+    spec_data: dict
+    validation_score: float | None = None
+    status: str
 
 
 @app.get("/")
@@ -168,10 +199,10 @@ def add_provenance(slug: str, provenance: Provenance):
 
     save_provenance(
         shop["id"],
-        provenance.source,
-        provenance.channel,
-        provenance.extraction,
-        provenance.approval
+        provenance.field_name,
+        provenance.source_type,
+        provenance.confidence,
+        provenance.confirmed
     )
 
     return {"message": "Provenance saved"}
@@ -196,7 +227,11 @@ def add_photo(slug: str, photo: Photo):
     if shop is None:
         return {"message": "Shop not found"}
 
-    save_photo(shop["id"], photo.filename)
+    save_photo(
+        shop["id"],
+        photo.filename,
+        photo.source
+    )
 
     return {"message": "Photo saved"}
 
@@ -211,3 +246,62 @@ def get_shop_photos(slug: str):
     photos = get_photos(shop["id"])
 
     return [dict(photo) for photo in photos]
+
+
+@app.post("/smes/{slug}/consent")
+def add_consent(slug: str, consent: Consent):
+    shop = get_shop(slug)
+
+    if shop is None:
+        return {"message": "Shop not found"}
+
+    save_consent(
+        shop["id"],
+        consent.consent_type,
+        consent.approved_at,
+        consent.payload_hash
+    )
+
+    return {"message": "Consent saved"}
+
+
+@app.get("/smes/{slug}/consent")
+def get_shop_consent(slug: str):
+    shop = get_shop(slug)
+
+    if shop is None:
+        return {"message": "Shop not found"}
+
+    data = get_consent(shop["id"])
+
+    return [dict(row) for row in data]
+
+
+@app.post("/smes/{slug}/website-spec")
+def add_website_spec(slug: str, spec: WebsiteSpec):
+    shop = get_shop(slug)
+
+    if shop is None:
+        return {"message": "Shop not found"}
+
+    save_website_spec(
+        shop["id"],
+        spec.version,
+        spec.spec_data,
+        spec.validation_score,
+        spec.status
+    )
+
+    return {"message": "WebsiteSpec saved"}
+
+
+@app.get("/smes/{slug}/website-spec")
+def get_shop_website_specs(slug: str):
+    shop = get_shop(slug)
+
+    if shop is None:
+        return {"message": "Shop not found"}
+
+    data = get_website_specs(shop["id"])
+
+    return data
